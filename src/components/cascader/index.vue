@@ -1,9 +1,7 @@
 <template>
   <view class="signature">
-    <!-- 签名主 -->
     <view class="signature__main">
-      <canvas
-              :id="$state.uidCanvas"
+      <canvas :id="$state.uidCanvas"
               hidpi
               disable-scroll
               :canvas-id="$state.uidCanvas"
@@ -13,9 +11,8 @@
               @touchmove="drawEvent"
               @touchend="drawEndEvent" />
       <!-- 内容占位 -->
-      <view
-              v-if="showPlaceholder"
-              class="signature__placeholder">
+      <view v-if="showPlaceholder"
+            class="signature__placeholder">
         <text>{{ $props.placeholder }}</text>
       </view>
     </view>
@@ -26,15 +23,13 @@
         </slot>
       </view>
       <view class="signature__btn-container">
-        <button
-                size="mini"
+        <button size="mini"
                 class="signature__btn"
                 :disabled="$props.disabled"
                 @click="cancelEvent">
           {{ $props.cancelText }}
         </button>
-        <button
-                size="mini"
+        <button size="mini"
                 type="primary"
                 class="signature__btn"
                 :disabled="$props.disabled"
@@ -125,7 +120,7 @@
     // 画布优先层级
     zIndex: {
       type: Number,
-      default: 99
+      default: 9
     }
   });
   const $state = reactive({
@@ -160,7 +155,11 @@
     // 是否为保存输出
     private static _saveOutStatus = false;
     private static _beginTime: null | number = null;
+    // 画布布局位置单例
+    private static _bounding: UniNamespace.NodeInfo | null = null;
     private static fs: UniNamespace.FileSystemManager = uni.getFileSystemManager();
+
+    // 指针存储
     static prev: number[] = [];
     static curr: number[] = [];
     // 嵌入图片路径
@@ -176,6 +175,25 @@
       return status;
     }
 
+    static get bounding() {
+      return this.getBounding();
+    }
+
+    static async getBounding() {
+      if (!this._bounding) {
+        const selector = uni.createSelectorQuery().in($refs.self);
+        this._bounding = await new Promise<UniNamespace.NodeInfo>((resolve) => {
+          selector
+            .select(`#${$state.uidCanvas}`)
+            .boundingClientRect((data) => {
+              resolve(data as UniNamespace.NodeInfo);
+            })
+            .exec();
+        });
+      }
+      return this._bounding;
+    }
+
     /**
      * 保存画布
      * @return {Promise<string>} base64字符集
@@ -183,26 +201,26 @@
     static async save(): Promise<string> {
       const extractBase64 = new Promise<string>((resolve, reject) => {
         uni.canvasToTempFilePath(
-            {
-              canvasId: $state.uidCanvas,
-              fileType: nuFileType.value,
-              // 图片质量
-              quality: 1,
-              success: ({ tempFilePath }) => {
-                this.fs.readFile({
-                  filePath: tempFilePath,
-                  encoding: "base64",
-                  success: ({ data }) => {
-                    this._saveOutStatus = true;
-                    resolve(base64Handler(data as string));
-                  }
-                });
-              },
-              fail(err) {
-                reject(err);
-              }
+          {
+            canvasId: $state.uidCanvas,
+            fileType: nuFileType.value,
+            // 图片质量
+            quality: 1,
+            success: ({ tempFilePath }) => {
+              this.fs.readFile({
+                filePath: tempFilePath,
+                encoding: "base64",
+                success: ({ data }) => {
+                  this._saveOutStatus = true;
+                  resolve(base64Handler(data as string));
+                }
+              });
             },
-            $refs.self
+            fail(err) {
+              reject(err);
+            }
+          },
+          $refs.self
         );
       });
       return await extractBase64;
@@ -256,23 +274,26 @@
     static async drawerImage(resource?: string) {
       // 只允许base64绘制
       if (!resource || !/^data:.+;base64,/.test(resource)) {
+        console.error("This signature canvas allows base64 drawing only");
         return;
       }
       this.killTemp();
 
       const draw = this._draw;
       const suffix = /^data:.+\/(?<suffix>\w+);/.exec(resource)?.groups?.suffix;
+      const { width, height } = await this.bounding;
+
       this.implantImgPath =
-          (uni as Uni & { env: { USER_DATA_PATH: string } })?.env?.USER_DATA_PATH +
-          `/${new Date().getTime()}.` +
-          suffix ?? "png";
+        (uni as Uni & { env: { USER_DATA_PATH: string } })?.env?.USER_DATA_PATH +
+        `/${new Date().getTime()}.` +
+        suffix ?? "png";
       // 写入本地文件
       this.fs.writeFile({
         filePath: this.implantImgPath,
         data: resource.replace(/^data.+;base64,/, ""),
         encoding: "base64",
         success: () => {
-          draw.drawImage(this.implantImgPath, 0, 0);
+          draw.drawImage(this.implantImgPath, 0, 0, width, height);
           draw.draw(true);
         },
         fail: (e) => {
@@ -295,17 +316,7 @@
      * @param {number} tolerance 公差
      */
     static async clear(tolerance = 10) {
-      const selector = uni.createSelectorQuery().in($refs.self);
-      const { width = 1000, height = 1000 } = await new Promise<UniNamespace.NodeInfo>(
-          (resolve) => {
-            selector
-                .select(`#${$state.uidCanvas}`)
-                .boundingClientRect((data) => {
-                  resolve(data as UniNamespace.NodeInfo);
-                })
-                .exec();
-          }
-      );
+      const { width = 1000, height = 1000 } = await this.bounding;
       this._draw.clearRect(0, 0, width + tolerance, height + tolerance);
       this._draw.draw();
     }
@@ -389,6 +400,62 @@
 </script>
 
 <style lang="scss" scoped>
-  @import "./scss/index.scss";
+  .signature {
+    box-sizing: border-box;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    width: v-bind("$props.width");
+    height: 100%;
 
+    &__main {
+      position: relative;
+    }
+
+    &__canvas {
+      position: relative;
+      z-index: v-bind("$props.zIndex");
+      width: 100%;
+      height: v-bind("$props.height");
+      border: 1px dotted #E0E0E0;
+      border-radius: 10upx;
+      background-color: v-bind("$props.backgroundColor");
+      cursor: pointer;
+    }
+
+    &__canvas--disabled {
+      opacity: 0.85;
+    }
+
+    &__placeholder {
+      position: absolute;
+      top: 45%;
+      left: 50%;
+      transform: translate(-50%);
+      z-index: v-bind(placeholderZindex);
+      color: #333;
+    }
+
+    &__operation {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-end;
+      margin: 20upx 20upx 0 20upx;
+    }
+
+    &__tip {
+      font-size: 24upx;
+      color: #9D9D9D;
+    }
+
+    &__btn-container {
+      margin-top: 10upx;
+
+      .signature__btn + .signature__btn {
+        margin-left: 10px;
+      }
+    }
+  }
 </style>
