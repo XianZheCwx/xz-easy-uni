@@ -1,4 +1,4 @@
-node_models/
+node_modules/
 
 # IDE与编辑器配置
 .vscode/

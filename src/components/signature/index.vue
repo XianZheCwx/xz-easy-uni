@@ -63,7 +63,8 @@
   import type { PropType } from "vue";
 
   import { useSignature } from "./hook/signature";
-  import { DrawSignature, DrawSignature2D, CanvasType } from "./helper/signature";
+  import { DrawSignature, DrawSignature2D } from "./helper/signature";
+  import type { CanvasType } from "./helper/signature";
 
   type UniTouchEvent = TouchEvent & { touches: (Touch & { x: number; y: number })[] };
 

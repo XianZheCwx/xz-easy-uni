@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "签名",
+  "usingComponents": {
+    "signature": "../../components/signature/index"
+  }
+}
