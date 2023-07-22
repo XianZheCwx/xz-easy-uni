@@ -9,12 +9,13 @@
       "list": [
         {
           "name": "签名示例",
-          "pathName": "examples-pages/signature/index",
+          "pathName": "demo-pages/signature/index",
           "query": "",
           "launchMode": "default",
           "scene": null
         }
       ]
     }
-  }
+  },
+  "libVersion": "2.33.0"
 }

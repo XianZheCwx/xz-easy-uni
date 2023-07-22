@@ -1242,7 +1242,7 @@ function populateParameters(fromRes, toRes) {
   const hostLanguage = language.replace(/_/g, "-");
   const parameters = {
     appId: "",
-    appName: "",
+    appName: "xzEasyUni",
     appVersion: "1.0.0",
     appVersionCode: "100",
     appLanguage: getAppLanguage(hostLanguage),
@@ -1386,7 +1386,7 @@ const getAppBaseInfo = {
       hostSDKVersion: SDKVersion,
       hostTheme: theme,
       appId: "",
-      appName: "",
+      appName: "xzEasyUni",
       appVersion: "1.0.0",
       appVersionCode: "100",
       appLanguage: getAppLanguage(hostLanguage)
@@ -5041,6 +5041,9 @@ const version = "3.2.47";
 function unwrapper(target) {
   return unref(target);
 }
+function defineAsyncComponent(source) {
+  console.error("defineAsyncComponent is unsupported");
+}
 const ARRAYTYPE = "[object Array]";
 const OBJECTTYPE = "[object Object]";
 function diff(current, pre) {
@@ -5930,11 +5933,16 @@ function stringify(styles) {
   }
   return ret;
 }
+function setRef(ref2, id, opts = {}) {
+  const { $templateRefs } = getCurrentInstance();
+  $templateRefs.push({ i: id, r: ref2, k: opts.k, f: opts.f });
+}
 const o = (value, key) => vOn(value, key);
 const s = (value) => stringifyStyle(value);
 const e = (target, ...sources) => extend(target, ...sources);
 const t = (val) => toDisplayString(val);
 const p = (props) => renderProps(props);
+const sr = (ref2, id, opts) => setRef(ref2, id, opts);
 function createApp$1(rootComponent, rootProps = null) {
   rootComponent && (rootComponent.mpType = "app");
   return createVueApp(rootComponent, rootProps).use(plugin);
@@ -6767,6 +6775,7 @@ const onLaunch = /* @__PURE__ */ createHook(ON_LAUNCH);
 exports._export_sfc = _export_sfc;
 exports.computed = computed;
 exports.createSSRApp = createSSRApp;
+exports.defineAsyncComponent = defineAsyncComponent;
 exports.defineComponent = defineComponent;
 exports.e = e;
 exports.getCurrentInstance = getCurrentInstance;
@@ -6783,6 +6792,7 @@ exports.p = p;
 exports.reactive = reactive;
 exports.ref = ref;
 exports.s = s;
+exports.sr = sr;
 exports.t = t;
 exports.unref = unref;
 exports.useCssVars = useCssVars;

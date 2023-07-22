@@ -4,7 +4,7 @@
   ],
   "subPackages": [
     {
-      "root": "examples-pages",
+      "root": "demo-pages",
       "pages": [
         "signature/index"
       ]

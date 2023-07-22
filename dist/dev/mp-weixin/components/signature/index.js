@@ -13,7 +13,7 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     // 画布背景颜色
     backgroundColor: {
       type: String,
-      default: "#F0F0F0"
+      default: "#FFF"
     },
     // 取消按钮文案
     cancelText: {

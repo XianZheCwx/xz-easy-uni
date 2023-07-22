@@ -10,7 +10,7 @@
   ],
   "subPackages": [
     {
-      "root": "examples-pages",
+      "root": "demo-pages",
       "pages": [
         {
           "path": "signature/index",
