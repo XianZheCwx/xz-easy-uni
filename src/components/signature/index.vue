@@ -72,104 +72,48 @@
   let signature: DrawSignature2D | DrawSignature;
   const { $refs, $state, landscapeOpts } = useSignature({
     __init__,
+    execute,
     signature: () => signature
   });
   const $props = defineProps({
     // 画布值
-    modelValue: {
-      type: String,
-      default: ""
-    },
+    modelValue: { type: String, default: "" },
     // 画布背景颜色
-    backgroundColor: {
-      type: String,
-      default: "#FFF"
-    },
+    bgc: { type: String, default: "#FFF" },
     // 取消按钮文案
-    cancelText: {
-      type: String,
-      default: "清空"
-    },
+    cancelText: { type: String, default: "清空" },
     // 确定按钮文案
-    confirmText: {
-      type: String,
-      default: "保存"
-    },
+    confirmText: { type: String, default: "保存" },
     // 是否禁用
-    disabled: {
-      type: Boolean,
-      default: false
-    },
+    disabled: { type: Boolean, default: false },
     // 导出文件类型
-    fileType: {
-      type: String as PropType<"png" | "jepg">,
-      default: "png"
-    },
+    fileType: { type: String as PropType<"png" | "jepg">, default: "png" },
     // 画布宽度
-    width: {
-      type: String,
-      default: "100%"
-    },
+    width: { type: String, default: "100%" },
     // 画布高度
-    height: {
-      type: String,
-      default: "200px"
-    },
+    height: { type: String, default: "200px" },
     // 是否启用高清
-    hd: {
-      type: Boolean,
-      default: true
-    },
+    hd: { type: Boolean, default: true },
     // 画笔宽度（大小）
-    lineWidth: {
-      type: Number,
-      default: 5
-    },
+    lineWidth: { type: Number, default: 5 },
     // 是否启用横屏
-    landscape: {
-      type: Boolean,
-      default: false
-    },
+    landscape: { type: Boolean, default: false },
     // 画笔颜色
-    penColor: {
-      type: String,
-      default: "#000"
-    },
+    penColor: { type: String, default: "#000" },
     // 签名占位提示
-    placeholder: {
-      type: String,
-      default: "滑动此处签名"
-    },
+    placeholder: { type: String, default: "滑动此处签名" },
     // 横屏签名占位提示
-    placeholderLandscape: {
-      type: String,
-      default: "点击进入签名"
-    },
+    placeholderLandscape: { type: String, default: "点击进入签名" },
     // 模式类型，默认webgl
-    type: {
-      type: String as PropType<CanvasType>,
-      default: "native"
-    },
+    type: { type: String as PropType<CanvasType>, default: "native" },
     // 签名提示贴士
-    tip: {
-      type: String,
-      default: ""
-    },
+    tip: { type: String, default: "" },
     // 是否显示清除按钮
-    showClearBtn: {
-      type: Boolean,
-      default: true
-    },
+    showClearBtn: { type: Boolean, default: true },
     // 是否显示保存按钮
-    showSaveBtn: {
-      type: Boolean,
-      default: true
-    },
+    showSaveBtn: { type: Boolean, default: true },
     // 画布优先层级
-    zIndex: {
-      type: Number,
-      default: 9
-    }
+    zIndex: { type: Number, default: 9 }
   });
   const $emits = defineEmits([
     "update:modelValue",
@@ -317,11 +261,9 @@
     // 绘制实例
     switch ($props.type) {
       case "2d":
-        console.group("xzTip: signature获取2d实例");
         signature = new DrawSignature2D(conf);
         break;
       default:
-        console.group("xzTip: signature获取2d实例");
         signature = new DrawSignature(conf);
     }
   }
@@ -331,9 +273,6 @@
     clearEvent
   });
 
-  onMounted(() => {
-    execute();
-  });
 </script>
 
 <style lang="scss" scoped>

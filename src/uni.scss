@@ -76,13 +76,13 @@ $uni-color-paragraph: #3F536E; // 文章段落颜色
 $uni-font-size-paragraph: 15px;
 
 // 页面安全容器
-@mixin container($bgc: #FCFCFC, $bottom: 40upx, $padding: true, $safeBottom: true) {
+@mixin container($bgc: #FCFCFC, $around: 30upx, $bottom: 40upx, $padding: true, $safeBottom: true) {
   @if $bgc {
     background-color: $bgc;
   }
 
   @if padding {
-    padding: 1vh 30upx $bottom;
+    padding: 2vh $around $bottom;
   }
 
   @if $safeBottom {

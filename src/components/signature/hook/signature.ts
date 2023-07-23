@@ -1,6 +1,16 @@
-import { getCurrentInstance, markRaw, onBeforeMount, onUnmounted, reactive } from "vue";
+import {
+  getCurrentInstance,
+  markRaw,
+  onBeforeMount,
+  onMounted,
+  onUnmounted,
+  reactive
+} from "vue";
 import type { ComponentInternalInstance } from "vue";
-import { DrawSignature, DrawSignature2D } from "@/components/signature/helper/signature";
+import type {
+  DrawSignature,
+  DrawSignature2D
+} from "@/components/signature/helper/signature";
 
 interface State {
   [state: string]: unknown;
@@ -9,13 +19,16 @@ interface State {
   emptyCanvas?: boolean;
 }
 
-export function useSignature({
-  __init__,
-  signature
-}: {
-  __init__?: () => void;
-  signature?: () => DrawSignature2D | DrawSignature;
-} = {}) {
+export function useSignature(
+  {
+    __init__,
+    execute,
+    signature
+  }: {
+    __init__: () => void;
+    execute: () => void;
+    signature: () => DrawSignature2D | DrawSignature;
+  }) {
   // @ts-ignore
   const $refs: { self: ComponentInternalInstance } = reactive({
     self: getCurrentInstance()
@@ -30,11 +43,17 @@ export function useSignature({
 
   onBeforeMount(() => {
     __init__ && __init__();
+    console.group("xzTip: signature获取实例");
+    console.log(signature?.());
+  });
+
+  onMounted(() => {
+    execute();
+    console.groupEnd();
   });
 
   onUnmounted(() => {
     signature?.().killTemp();
-    console.groupEnd();
   });
 
   return { $refs, $state, landscapeOpts };

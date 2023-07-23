@@ -9,7 +9,7 @@
     <demo-item :title="signature_3.title">
       <signature v-model="signature_3.val"
                  type="2d"
-                 background-color="#F0F0F0" placeholder="请确保为本人签名" confirm-text="确定" cancel-text="取消" />
+                 bgc="#F0F0F0" placeholder="请确保为本人签名" confirm-text="确定" cancel-text="取消" />
     </demo-item>
     <demo-item :title="signature_4.title">
       <signature :ref="el => $ref.signature_4 = el"
@@ -27,7 +27,6 @@
   */
   import { computed, reactive, onMounted } from "vue";
   import Signature from "@/components/signature";
-  import DemoItem from "@/components/demo/demo-item.vue";
 
   const $ref = reactive({
     signature_4: null
