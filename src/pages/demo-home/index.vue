@@ -6,7 +6,8 @@
     </view>
     <view class="demo-home__bd">
       <demo-item :title="formOpts.title">
-
+        <cell v-for="item in formOpts.list" :id="item.to"
+              :lable="item.label" :to="item.to"/>
       </demo-item>
     </view>
   </view>
@@ -15,14 +16,14 @@
 <script lang="ts" setup>
   /*
  * 组件名: index
- * 组件用途: XXX
+ * 组件用途: xzEasyUni组件目录
  * 创建日期: 2023/7/23
  * 编写者: XianZhe
  */
   import { computed, reactive, onMounted } from "vue";
 
-  import Cell from "@/components/cell";
-  import { formOpts } from "./config";
+  import Cell from "@/components/cell/index.vue";
+  import { formOpts } from "../config";
 
   const $props = defineProps({});
   const $state = reactive({});
@@ -43,10 +44,13 @@
     &__hd {
       display: flex;
       justify-content: space-between;
+      height: 100px;
+      margin-bottom: 10px;
     }
 
     &__bd {
-      display: grid;
+      display: flex;
+      flex-direction: column;
       //grid-template: ;
     }
   }
