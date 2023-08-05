@@ -43,8 +43,8 @@ export function useSignature(
 
   onBeforeMount(() => {
     __init__ && __init__();
-    console.group("xzTip: signature获取实例");
-    console.log(signature?.());
+    console.groupCollapsed("xzTip: signature获取实例", (new Date()).toDateString());
+    console.log(signature?.constructor);
   });
 
   onMounted(() => {

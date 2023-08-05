@@ -1,43 +1,20 @@
 /**
  * 画布组件程序辅助
  */
-import type { ComponentInternalInstance } from "vue";
+import type {
+  CanvasType,
+  UniCanvasContext2D,
+  UniCanvasContext,
+  UniCanvasElement,
+  SignatureConfs,
+  DrawImage
+} from "../types";
 
 const fs: UniNamespace.FileSystemManager = uni.getFileSystemManager();
 
-export type CanvasType = "native" | "webgl" | "2d";
-
-export type UniCanvasContext = UniNamespace.CanvasContext;
-
-export type UniCanvasContext2D = CanvasRenderingContext2D;
-
-export interface UniCanvasElement extends HTMLCanvasElement {
-  createImage: () => HTMLImageElement & { onload: () => void };
-}
-
-//export interface Signature2DCtx {canvas: HTMLCanvasElement; ctx: UniCanvasContext2D}
-
-export interface SignatureProps {
-  self: ComponentInternalInstance;
-  uidCanvas: string | number;
-  fileType: "png" | "jepg";
-  hd?: boolean;
-  // 签名样式
-  style?: {
-    penColor?: string;
-    lineWidth?: number;
-  };
-}
-
-export namespace DrawImage {
-  export type resource = string;
-  export type direction = "left" | "right" | number;
-  export type origin = [number, number];
-}
-
 export abstract class AbstractSignature {
   // 源数据参数获取回调
-  protected _rawprops?: () => SignatureProps;
+  protected _rawprops?: () => SignatureConfs;
   // 画布布局位置单例
   protected _bounding: UniNamespace.NodeInfo | null = null;
   // 是否为保存输出
@@ -52,7 +29,7 @@ export abstract class AbstractSignature {
   // 嵌入图片路径
   implantImgPath = "";
 
-  protected constructor(props: () => SignatureProps) {
+  protected constructor(props: () => SignatureConfs) {
     if (this.constructor === AbstractSignature) {
       throw new TypeError("❗❗不允许实例化AbstractSignature抽象类❗❗");
     }
@@ -60,11 +37,11 @@ export abstract class AbstractSignature {
     this._rawprops = props;
   }
 
-  get props(): SignatureProps {
+  get props(): SignatureConfs {
     return this._rawprops!();
   }
 
-  get styles(): Required<SignatureProps>["style"] {
+  get styles(): Required<SignatureConfs>["style"] {
     return this.props.style ?? {};
   }
 
@@ -131,7 +108,8 @@ export abstract class AbstractSignature {
    * @param {UniCanvasContext} ctx canvas上下文
    * @param type
    */
-  setPenStyle(ctx: UniCanvasContext | UniCanvasContext2D, type: CanvasType = "native") {
+  setPenStyle(ctx: UniCanvasContext | UniCanvasContext2D,
+              type: CanvasType = "native") {
     const { lineWidth, penColor } = this.styles;
     // 2d样式
     if (/^2d$/i.test(type)) {
@@ -150,7 +128,8 @@ export abstract class AbstractSignature {
 
   drawImage(resource: DrawImage.resource, direction?: DrawImage.direction) {}
 
-  async rotate(direction: DrawImage.direction, origin: DrawImage.origin = [0, 0]) {
+  async rotate(direction: DrawImage.direction,
+               origin: DrawImage.origin = [0, 0]) {
     const ctx = await this.ctx;
     const angle = (90 * Math.PI) / 180;
     const [centreX, centreY] = origin;
@@ -240,8 +219,8 @@ export abstract class AbstractSignature {
     this.killTemp();
     this.implantImgPath =
       (uni as Uni & { env: { USER_DATA_PATH: string } })?.env?.USER_DATA_PATH +
-        `/${new Date().getTime()}.` +
-        suffix ?? "png";
+      `/${new Date().getTime()}.` +
+      suffix ?? "png";
     // 写入本地文件处理
     await writeFile(resource, this.implantImgPath);
     return true;
@@ -275,7 +254,7 @@ export abstract class AbstractSignature {
 export class DrawSignature extends AbstractSignature {
   private _ctx?: UniCanvasContext;
 
-  constructor(props: () => SignatureProps) {
+  constructor(props: () => SignatureConfs) {
     super(props);
   }
 
@@ -314,7 +293,8 @@ export class DrawSignature extends AbstractSignature {
    * @param direction
    * @return {Promise<void>}
    */
-  async drawImage(resource: DrawImage.resource, direction?: DrawImage.direction) {
+  async drawImage(resource: DrawImage.resource,
+                  direction?: DrawImage.direction) {
     const ctx = this.ctx;
     const { width, height } = await this.bounding;
     const [centreX, centreY] = [width! / 2, height! / 2];
@@ -345,7 +325,7 @@ export class DrawSignature extends AbstractSignature {
 export class DrawSignature2D extends AbstractSignature {
   private _ctx2d?: UniCanvasContext2D;
 
-  constructor(props: () => SignatureProps) {
+  constructor(props: () => SignatureConfs) {
     super(props);
     this.get2dcanvas(true);
   }
@@ -367,9 +347,9 @@ export class DrawSignature2D extends AbstractSignature {
         .select(`#${this.props.uidCanvas}`)
         .node(({ node } = {}) => {
           !node &&
-            reject(
-              "Failed to get the node. Please check whether the canvas element is assigned an id"
-            );
+          reject(
+            "Failed to get the node. Please check whether the canvas element is assigned an id"
+          );
 
           const ctx = (node as HTMLCanvasElement).getContext("2d")! as UniCanvasContext2D;
           resolve({ canvas: node, ctx });
@@ -421,7 +401,8 @@ export class DrawSignature2D extends AbstractSignature {
     ctx.stroke();
   }
 
-  async drawImage(resource: DrawImage.resource, direction?: DrawImage.direction) {
+  async drawImage(resource: DrawImage.resource,
+                  direction?: DrawImage.direction) {
     const ctx = await this.ctx;
     const { width, height } = await this.bounding;
     const [centreX, centreY] = [width! / 2, height! / 2];
@@ -456,7 +437,7 @@ export class DrawSignature2D extends AbstractSignature {
 /**
  * WebGl画布类型
  */
-export class DrawSignatureWebGl extends DrawSignature {}
+// export class DrawSignatureWebGl extends DrawSignature {}
 
 export function base64Handler(coding: string, suffix: string) {
   return `data:image/${suffix};base64,` + coding;
