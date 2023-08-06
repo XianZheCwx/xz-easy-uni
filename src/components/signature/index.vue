@@ -18,7 +18,7 @@
       <view
         v-if="showPlaceholder"
         class="signature__placeholder">
-        <text>{{ placeholderContext.text }}</text>
+        <text>{{ placeholderCtx.text }}</text>
       </view>
     </view>
     <view class="signature__operation">
@@ -59,166 +59,23 @@
    * 创建日期: 2023/5/26
    * 编写者: XianZhe
    */
-  import { computed, watchEffect, nextTick } from "vue";
-
   import { signatureProps, signatureEmits } from "./helper/props";
   import { useSignature } from "./hook/signature";
-  import { DrawSignature, DrawSignature2D } from "./helper/signature";
 
-  type UniTouchEvent = TouchEvent & { touches: (Touch & { x: number; y: number })[] };
-
-  // 签名绘制实例
-  let signature: DrawSignature2D | DrawSignature;
-  const { $refs, $state, landscapeOpts } = useSignature({
-    __init__,
-    execute,
-    signature: () => signature
-  });
   const $props = defineProps(signatureProps);
   const $emits = defineEmits(signatureEmits);
-
-  // 强制标准文件类型
-  const nuFileType = computed<"png" | "jepg">(() => {
-    if (/^(png|jepg)$/.test($props.fileType)) {
-      return $props.fileType;
-    }
-    console.warn(`不支持${$props.fileType}文件类型`);
-    return "png";
-  });
-
-  const nuCanvasType = computed(() => {
-    if (["native"].includes($props.type)) {
-      return "";
-    }
-    return $props.type;
-  });
-
-  const showPlaceholder = computed<boolean>(() => {
-    return !!$state.emptyCanvas && !$props.disabled;
-  });
-
-  // 占位符上下文控制
-  const placeholderContext = computed<{ text: string; zindex: number }>(() => {
-    let text = $props.landscape ? $props.placeholder : $props.placeholderLandscape;
-    if (landscapeOpts.show) {
-      text = $props.placeholder;
-    }
-    return { zindex: $props.zIndex + 1, text };
-  });
-
-  // 操作上下文控制
-  const operationContext = computed(() => {
-    const context = {
-      save: $props.showSaveBtn,
-      clear: $props.showClearBtn,
-      show: $props.showSaveBtn || $props.showClearBtn
-    };
-    if ($props.landscape && !landscapeOpts.show) {
-      Object.assign(context, { show: false });
-    }
-    return context;
-  });
-
-  // 横竖屏切换
-  function overturnSwitch(base64: string, direction?: "left" | "right") {
-    return new Promise<void>((resolve) => {
-      // 需要DOM切换完毕后获取宽高
-      nextTick(async () => {
-        await signature.clear();
-        await signature.reset();
-        await signature.drawImage(base64, direction);
-        resolve();
-      });
-    });
-  }
-
-  function drawEvent(e: UniTouchEvent, isstart: boolean) {
-    // 禁用状态
-    if ($props.disabled) {
-      return;
-    }
-    // 开启横屏且画布转换
-    if ($props.landscape && !landscapeOpts.show) {
-      uni.showLoading({ title: "请稍等~", mask: true });
-      landscapeOpts.show = true;
-      overturnSwitch($props.modelValue, "right");
-
-      uni.hideLoading();
-      $emits("landscape", landscapeOpts.show);
-      return;
-    }
-
-    const { x, y } = e?.touches?.[0];
-    $state.emptyCanvas = false;
-    signature.execute(x, y);
-
-    if (isstart) {
-      return $emits("start", e);
-    }
-    $emits("signing", e);
-  }
-
-  function drawEndEvent(e: UniTouchEvent) {
-    signature.reset(true);
-    $emits("end", e);
-  }
-
-  async function saveEvent() {
-    await uni.showLoading({ title: "正在保存中~", mask: true });
-
-    if ($props.landscape) {
-      // 横屏画布base64
-      const lbase64 = await signature.save();
-      landscapeOpts.show = false;
-      $emits("landscape", landscapeOpts.show);
-      await overturnSwitch(lbase64, "left");
-    }
-    // 竖屏画布base64
-    const base64 = await signature.save();
-    uni.hideLoading();
-
-    $emits("save", base64);
-    $emits("update:modelValue", base64);
-  }
-
-  function clearEvent() {
-    signature.clear();
-    $emits("clear");
-  }
-
-  function execute() {
-    watchEffect(() => {
-      // 主动抛出不作为画布绘入
-      if (!$props.modelValue || signature.saveOutStatus) {
-        return;
-      }
-      $state.emptyCanvas = false;
-      // 画布绘入
-      signature.drawImage($props.modelValue);
-    });
-  }
-
-  function __init__() {
-    const conf = () => ({
-      self: $refs.self,
-      uidCanvas: $state.uidCanvas!,
-      fileType: nuFileType.value,
-      hd: $props.hd,
-      style: {
-        penColor: $props.penColor,
-        lineWidth: $props.lineWidth
-      }
-    });
-
-    // 绘制实例
-    switch ($props.type) {
-      case "2d":
-        signature = new DrawSignature2D(conf);
-        break;
-      default:
-        signature = new DrawSignature(conf);
-    }
-  }
+  const {
+    $state,
+    landscapeOpts,
+    clearEvent,
+    drawEvent,
+    drawEndEvent,
+    saveEvent,
+    placeholderCtx,
+    showPlaceholder,
+    operationContext,
+    nuCanvasType
+  } = useSignature($props, $emits);
 
   defineExpose({
     saveEvent,
@@ -244,7 +101,7 @@
     }
 
     &__placeholder {
-      z-index: v-bind("placeholderContext.zindex");
+      z-index: v-bind("placeholderCtx.zindex");
     }
   }
 </style>

@@ -6,7 +6,7 @@
     </view>
     <view class="demo-home__bd">
       <demo-item :title="formOpts.title">
-        <cell v-for="item in formOpts.list" :id="item.to"
+        <cell v-for="item in formOpts.list" :key="item.to"
               :lable="item.label" :to="item.to"/>
       </demo-item>
     </view>

@@ -1,4 +1,3 @@
-
 import type { ComponentInternalInstance } from "vue";
 
 
@@ -7,6 +6,10 @@ export type CanvasType = "native" | "webgl" | "2d";
 export type UniCanvasContext = UniNamespace.CanvasContext;
 
 export type UniCanvasContext2D = CanvasRenderingContext2D;
+
+export type UniTouchEvent =
+  TouchEvent
+  & { touches: (Touch & { x: number; y: number })[] };
 
 export interface UniCanvasElement extends HTMLCanvasElement {
   createImage: () => HTMLImageElement & { onload: () => void };

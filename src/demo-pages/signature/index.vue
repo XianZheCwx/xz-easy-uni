@@ -8,8 +8,9 @@
     </demo-item>
     <demo-item :title="signature_3.title">
       <signature v-model="signature_3.val"
-                 type="2d"
-                 bgc="#F0F0F0" placeholder="请确保为本人签名" confirm-text="确定" cancel-text="取消" />
+                 landscape type="2d" bgc="#F0F0F0"
+                 placeholder="请确保本人签名"  placeholder-landscape="点击保存退出签名"
+                 confirm-text="确定" cancel-text="取消" />
     </demo-item>
     <demo-item :title="signature_4.title">
       <signature :ref="el => $ref.signature_4 = el"

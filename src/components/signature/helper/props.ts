@@ -1,6 +1,6 @@
 import type { PropType, ExtractPropTypes } from "vue";
 
-import type { CanvasType } from "./signature";
+import type { CanvasType } from "../types";
 
 export const signatureProps = {
   // 画布值

@@ -4,7 +4,9 @@
       <view class="cell_label">{{ $props.lable }}</view>
     </slot>
     <slot name="icon">
-      <view class="cell_icon">{{}}</view>
+      <view class="cell__icon">
+        <uni-icons :type="$props.icon" color="inherit" />
+      </view>
     </slot>
   </view>
 </template>
@@ -18,22 +20,18 @@
  */
   import { computed, reactive, onMounted } from "vue";
 
+  import { cellProps } from "./helper/props";
   import { Router } from "@/utils/xzHelper";
 
-  const $props = defineProps({
-    lable: { type: String, required: true },
-    to: { type: String },
-    height: { type: String, default: "80rpx" },
-    bgc: { type: String, default: "#FFF" },
-    activeBgc: { type: String, default: "#F3F3F3" },
-    style: { type: Object, default: {} }
-  });
+  const $props = defineProps(cellProps);
   const $state = reactive({});
   const $emits = defineEmits([]);
 
 
   function cellEvent() {
-    Router.push($props.to);
+    if ($props.to) {
+      Router.push($props.to);
+    }
   }
 
   onMounted(() => {
@@ -49,14 +47,19 @@
     align-items: center;
     width: 100%;
     height: v-bind("$props.height");
-    padding: 10rpx 20rpx;
+    padding: 10rpx 30rpx;
     background-color: v-bind("$props.bgc");
     border-radius: 16rpx;
     box-shadow: 0 0 5px #8F8F94;
     cursor: pointer;
 
     &:active {
-      background-color: v-bind("$props.activeBgc")
+      background-color: v-bind("$props.activeBgc");
+    }
+
+    &__icon {
+      width: 10%;
+      height: 100%;
     }
   }
 

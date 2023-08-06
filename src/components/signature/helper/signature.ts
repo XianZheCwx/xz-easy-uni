@@ -10,7 +10,8 @@ import type {
   DrawImage
 } from "../types";
 
-const fs: UniNamespace.FileSystemManager = uni.getFileSystemManager();
+export const dpr = uni.getWindowInfo().pixelRatio;
+export const fs: UniNamespace.FileSystemManager = uni.getFileSystemManager();
 
 export abstract class AbstractSignature {
   // 源数据参数获取回调
@@ -128,8 +129,10 @@ export abstract class AbstractSignature {
 
   drawImage(resource: DrawImage.resource, direction?: DrawImage.direction) {}
 
-  async rotate(direction: DrawImage.direction,
-               origin: DrawImage.origin = [0, 0]) {
+  async rotate(
+    direction: DrawImage.direction,
+    origin: DrawImage.origin = [0, 0]
+  ) {
     const ctx = await this.ctx;
     const angle = (90 * Math.PI) / 180;
     const [centreX, centreY] = origin;
@@ -372,8 +375,7 @@ export class DrawSignature2D extends AbstractSignature {
    * @param {number} height
    */
   initCanvas2d(ctx: UniCanvasContext2D, width: number, height: number) {
-    const dpr = uni.getWindowInfo().pixelRatio;
-    console.log(`像素比: dpr：${dpr}, width：${width}, height：${height}`);
+    console.log(`xzTips：width=${width}, height=${height}`);
     this.canvas!.width = width! * dpr;
     this.canvas!.height = height! * dpr;
     ctx.scale(dpr, dpr);
