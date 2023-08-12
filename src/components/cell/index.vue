@@ -5,7 +5,7 @@
     </slot>
     <slot name="icon">
       <view class="cell__icon">
-        <uni-icons :type="$props.icon" color="inherit" />
+        <uni-icons :type="$props.icon" color="inherit" size="1.5em" />
       </view>
     </slot>
   </view>
@@ -13,11 +13,11 @@
 
 <script lang="ts" setup>
   /*
- * 组件名: index
- * 组件用途: XXX
- * 创建日期: 2023/7/23
- * 编写者: XianZhe
- */
+   * 组件名: index
+   * 组件用途: XXX
+   * 创建日期: 2023/7/23
+   * 编写者: XianZhe
+   */
   import { computed, reactive, onMounted } from "vue";
 
   import { cellProps } from "./helper/props";
@@ -26,7 +26,6 @@
   const $props = defineProps(cellProps);
   const $state = reactive({});
   const $emits = defineEmits([]);
-
 
   function cellEvent() {
     if ($props.to) {
@@ -50,7 +49,7 @@
     padding: 10rpx 30rpx;
     background-color: v-bind("$props.bgc");
     border-radius: 16rpx;
-    box-shadow: 0 0 5px #8F8F94;
+    box-shadow: 0 0 5px v-bind("$props.shadow");
     cursor: pointer;
 
     &:active {
@@ -59,7 +58,8 @@
 
     &__icon {
       width: 10%;
-      height: 100%;
+      font-size: 28rpx;
+      color: $uni-text-color;
     }
   }
 

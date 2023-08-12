@@ -7,7 +7,8 @@ export const cellProps = {
   height: { type: String, default: "80rpx" },
   bgc: { type: String, default: "#FFF" },
   activeBgc: { type: String, default: "#F3F3F3" },
-  style: { type: Object, default: {} }
+  style: { type: Object, default: {} },
+  shadow: {type: String, default: "#F0F0F0"}
 };
 
 export type CellProps = ExtractPropTypes<typeof cellProps>
