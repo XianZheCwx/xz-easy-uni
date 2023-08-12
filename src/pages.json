@@ -1,16 +1,75 @@
 //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
 {
+  "easycom": {
+    "autoscan": false,
+    "custom": {
+      "^uni-(.*)": "@dcloudio/uni-ui/lib/uni-$1/uni-$1.vue"
+    }
+  },
+  "condition": {
+    "current": 0,
+    "list": [
+      {
+        "name": "xzEasyUni组件目录",
+        "path": "/demo-pages/home/index"
+      },
+      {
+        "name": "文章资讯",
+        "path": "pages/blogs/index"
+      }
+    ]
+  },
+  "tabBar": {
+    "color": "",
+    "selectedColor": "",
+    "backgroundColor": "#FFF",
+    "iconfontSrc": "",
+    "list": [
+      {
+        "text": "首页",
+        "pagePath": "pages/home/index",
+        "iconfont": {
+          "text": "",
+          "fontSize": "12px"
+        }
+      },
+      {
+        "text": "文章资讯",
+        "pagePath": "pages/blogs/index"
+      },
+      {
+        "text": "工作台",
+        "pagePath": "pages/workbench/index"
+      },
+      {
+        "text": "我的",
+        "pagePath": "pages/mine/index"
+      }
+    ]
+  },
   "pages": [
     {
       "path": "pages/home/index",
       "style": {
-        "navigationBarTitleText": "贤哲的百宝袋"
+        "navigationBarTitleText": "首页"
       }
     },
     {
-      "path": "pages/demo-home/index",
+      "path": "pages/blogs/index",
       "style": {
-        "navigationBarTitleText": "xzEasyUni组件目录"
+        "navigationBarTitleText": "文章资讯"
+      }
+    },
+    {
+      "path": "pages/workbench/index",
+      "style": {
+        "navigationBarTitleText": "工作台"
+      }
+    },
+    {
+      "path": "pages/mine/index",
+      "style": {
+        "navigationBarTitleText": "我的"
       }
     }
   ],
@@ -18,6 +77,12 @@
     {
       "root": "demo-pages",
       "pages": [
+        {
+          "path": "home/index",
+          "style": {
+            "navigationBarTitleText": "xzEasyUni组件目录"
+          }
+        },
         {
           "path": "signature/index",
           "style": {
