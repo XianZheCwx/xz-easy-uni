@@ -16,22 +16,24 @@
         @touchend="drawEndEvent" />
       <!-- 内容占位 -->
       <view
-        v-if="showPlaceholder"
+        v-if="placeholderCtx.show"
         class="signature__placeholder">
-        <text>{{ placeholderCtx.text }}</text>
+        <slot name="placeholder">
+          <text>{{ placeholderCtx.text }}</text>
+        </slot>
       </view>
     </view>
     <view class="signature__operation">
       <view class="signature__tip">
         <slot name="tip">
-          <text v-if="$props.tip">{{ $props.tip }}</text>
+          <text v-if="tipCtx.show">{{ $props.tip }}</text>
         </slot>
       </view>
       <view
-        v-if="operationContext.show"
+        v-if="operationCtx.show"
         class="signature__btn-container">
         <button
-          v-if="operationContext.clear"
+          v-if="operationCtx.clear"
           size="mini"
           class="signature__btn"
           :disabled="$props.disabled"
@@ -39,7 +41,7 @@
           {{ $props.cancelText }}
         </button>
         <button
-          v-if="operationContext.save"
+          v-if="operationCtx.save"
           size="mini"
           type="primary"
           class="signature__btn"
@@ -71,9 +73,9 @@
     drawEvent,
     drawEndEvent,
     saveEvent,
+    tipCtx,
     placeholderCtx,
-    showPlaceholder,
-    operationContext,
+    operationCtx,
     nuCanvasType
   } = useSignature($props, $emits);
 
@@ -98,6 +100,11 @@
 
     &__canvas {
       background-color: v-bind("$props.bgc");
+    }
+
+
+    &__tip {
+      color: v-bind("$props.tipColor")
     }
 
     &__placeholder {

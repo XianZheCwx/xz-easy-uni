@@ -29,9 +29,11 @@ $lsPaddingBottom: calc($lsPadding + env(safe-area-inset-bottom, 0));
 
   &__placeholder {
     position: absolute;
-    top: 45%;
+    top: 50%;
     left: 50%;
-    transform: translateX(-50%);
+    width: 70%;
+    transform: translate(-50%, -50%);
+    text-align: center;
     color: #333;
   }
 
@@ -44,11 +46,10 @@ $lsPaddingBottom: calc($lsPadding + env(safe-area-inset-bottom, 0));
 
   &__tip {
     font-size: 24rpx;
-    color: #9D9D9D;
   }
 
   &__btn-container {
-    margin-top: 10rpx;
+    margin-top: 8px;
 
     .signature__btn + .signature__btn {
       margin: 0 0 0 20rpx;
@@ -75,16 +76,17 @@ $lsPaddingBottom: calc($lsPadding + env(safe-area-inset-bottom, 0));
   }
 
   .signature__operation {
+    align-items: center;
     margin: 0 10rpx 0 0;
     transform: rotate(90deg);
     transform-origin: center;
   }
 
   .signature__placeholder {
-    transform: rotate(90deg) translateY(50%);
+    transform: translate(-50%, -50%) rotate(90deg);
     transform-origin: center;
     top: 50%;
-    left: 39%;
+    left: 50%;
   }
 
   .signature__btn-container {

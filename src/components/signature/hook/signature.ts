@@ -32,7 +32,7 @@ export function useSignature(
     uidCanvas: `signature-${Math.trunc(Math.random() * 1000000)}`,
     emptyCanvas: true
   });
-  const landscapeOpts: State = reactive({
+  const landscapeOpts = reactive({
     show: false
   });
 
@@ -55,21 +55,30 @@ export function useSignature(
     return $props.type;
   });
 
-  const showPlaceholder = computed<boolean>(() => {
-    return !!$state.emptyCanvas && !$props.disabled;
+  // 提示上下文
+  const tipCtx = computed<{ show: boolean }>(() => {
+    return {
+      show: !!($props.landscape ? landscapeOpts.show && $props.tip : $props.tip)
+    };
   });
 
-  // 占位符上下文控制
-  const placeholderCtx = computed<{ text: string; zindex: number }>(() => {
+  // 占位符上下文
+  const placeholderCtx = computed<
+    { text: string; zindex: number; show: boolean }
+  >(() => {
     let text = $props.placeholder;
     if (landscapeOpts.show) {
       text = $props.placeholderLandscape;
     }
-    return { zindex: $props.zIndex + 1, text };
+    return {
+      text,
+      zindex: $props.zIndex + 1,
+      show: !!$state.emptyCanvas && !$props.disabled
+    };
   });
 
   // 操作上下文控制
-  const operationContext = computed(() => {
+  const operationCtx = computed(() => {
     const context = {
       save: $props.showSaveBtn,
       clear: $props.showClearBtn,
@@ -200,9 +209,9 @@ export function useSignature(
 
   return {
     $refs, $state, landscapeOpts, nuCanvasType,
-    showPlaceholder,
+    tipCtx,
     placeholderCtx,
-    operationContext,
+    operationCtx,
     drawEvent,
     drawEndEvent,
     saveEvent,

@@ -31,10 +31,12 @@ export const signatureProps = {
   placeholder: { type: String, default: "滑动此处签名" },
   // 横屏签名占位提示
   placeholderLandscape: { type: String, default: "点击进入签名" },
-  // 模式类型，默认webgl
+  // 模式类型，默认native
   type: { type: String as PropType<CanvasType>, default: "native" },
   // 签名提示贴士
   tip: { type: String, default: "" },
+  // 签名提示贴士
+  tipColor: {type: String, default: "#9D9D9D"},
   // 是否显示清除按钮
   showClearBtn: { type: Boolean, default: true },
   // 是否显示保存按钮
