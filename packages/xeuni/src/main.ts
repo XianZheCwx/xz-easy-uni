@@ -9,7 +9,5 @@ export function createApp() {
   // 注册全局组件
   app.component("DemoItem", DemoItem);
 
-  return {
-    app
-  };
+  return { app };
 }

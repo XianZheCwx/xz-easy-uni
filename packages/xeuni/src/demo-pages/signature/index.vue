@@ -1,7 +1,7 @@
 <template>
   <view id="signature">
     <demo-item :title="signature_1.title">
-      <signature v-model="signature_1.val" type="2d" tip="点击保存退出签名" />
+      <signature v-model="signature_1.val" type="2d" tip="签名完毕请点击保存" />
     </demo-item>
     <demo-item :title="signature_2.title">
       <signature v-model="signature_2.val" landscape type="2d" />
@@ -10,7 +10,7 @@
       <signature v-model="signature_3.val"
                  landscape type="2d" bgc="#F0F0F0"
                  placeholder="请确保本人签名" placeholder-landscape="签名是代表本人的重要凭证之一"
-                 tip="点击保存退出签名" tipColor="#600000" confirm-text="确定" cancel-text="取消" />
+                 tip="点击保存退出签名" tip-color="#600000" confirm-text="确定" cancel-text="取消" />
     </demo-item>
     <demo-item :title="signature_4.title">
       <signature :ref="el => $ref.signature_4 = el"
