@@ -1,48 +1,54 @@
-import type { PropType, ExtractPropTypes } from "vue";
+import type { ExtractPropTypes } from "vue";
 
+import {
+  makeNumericProp,
+  markStringProp,
+  lieProp,
+  truthProp
+} from "@/utils";
 import type { CanvasType } from "../types";
 
 export const signatureProps = {
   // 画布值
-  modelValue: { type: String, default: "" },
+  modelValue: String,
   // 画布背景颜色
-  bgc: { type: String, default: "#FFF" },
+  bgc: markStringProp("#FFF"),
   // 取消按钮文案
-  cancelText: { type: String, default: "清空" },
+  cancelText: markStringProp("清空"),
   // 确定按钮文案
-  confirmText: { type: String, default: "保存" },
+  confirmText: markStringProp("保存"),
   // 是否禁用
-  disabled: { type: Boolean, default: false },
+  disabled: lieProp,
   // 导出文件类型
-  fileType: { type: String as PropType<"png" | "jepg">, default: "png" },
+  fileType: markStringProp<"jepg" | "png">("png"),
   // 画布宽度
-  width: { type: String, default: "100%" },
+  width: markStringProp("100%"),
   // 画布高度
-  height: { type: String, default: "200px" },
+  height: markStringProp("200px"),
   // 是否启用高清
-  hd: { type: Boolean, default: true },
+  hd: truthProp,
   // 画笔宽度（大小）
-  lineWidth: { type: Number, default: 5 },
+  lineWidth: makeNumericProp(5),
   // 是否启用横屏
-  landscape: { type: Boolean, default: false },
+  landscape: lieProp,
   // 画笔颜色
-  penColor: { type: String, default: "#000" },
+  penColor: markStringProp("#555"),
   // 签名占位提示
-  placeholder: { type: String, default: "滑动此处签名" },
+  placeholder: markStringProp("滑动此处签名"),
   // 横屏签名占位提示
-  placeholderLandscape: { type: String, default: "点击进入签名" },
+  placeholderLandscape: markStringProp("点击进入签名"),
   // 模式类型，默认native
-  type: { type: String as PropType<CanvasType>, default: "native" },
+  type: markStringProp<CanvasType>("native"),
   // 签名提示贴士
-  tip: { type: String, default: "" },
+  tip: String,
   // 签名提示贴士
-  tipColor: {type: String, default: "#9D9D9D"},
+  tipColor: markStringProp("#9D9D9D"),
   // 是否显示清除按钮
-  showClearBtn: { type: Boolean, default: true },
+  showClearBtn: truthProp,
   // 是否显示保存按钮
-  showSaveBtn: { type: Boolean, default: true },
+  showSaveBtn: truthProp,
   // 画布优先层级
-  zIndex: { type: Number, default: 9 }
+  zIndex: makeNumericProp(9)
 } as const;
 
 

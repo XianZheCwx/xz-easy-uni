@@ -21,7 +21,7 @@
   import { computed, reactive, onMounted } from "vue";
 
   import { cellProps } from "./helper/props";
-  import { Router } from "@/utils/xzHelper";
+  import { Router } from "@/utils";
 
   const $props = defineProps(cellProps);
   const $state = reactive({});
