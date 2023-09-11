@@ -2,11 +2,12 @@
   "extends": "@vue/tsconfig/tsconfig.json",
   "compilerOptions": {
     "sourceMap": true,
+    "esModuleInterop": true,
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     },
-    "lib": ["esnext", "dom"],
+    "lib": ["esNext", "dom"],
     "types": ["@dcloudio/types", "unplugin-vue-define-options/macros-global"]
   },
   "include": [
