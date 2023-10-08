@@ -11,7 +11,10 @@ import type {
 } from "../types";
 
 export const dpr = uni.getWindowInfo().pixelRatio;
+
+// #ifndef APP-PLUS
 export const fs: UniNamespace.FileSystemManager = uni.getFileSystemManager();
+// #endif
 
 export abstract class AbstractSignature {
   // 源数据参数获取回调
@@ -163,6 +166,10 @@ export abstract class AbstractSignature {
         // 图片质量
         quality: this.props.hd ? 0 : 1,
         success: ({ tempFilePath }: { tempFilePath: string }) => {
+          // #ifdef APP-PLUS
+          resolve(tempFilePath);
+          // #endif
+          // #ifndef APP-PLUS
           fs.readFile({
             filePath: tempFilePath,
             encoding: "base64",
@@ -171,6 +178,7 @@ export abstract class AbstractSignature {
               resolve(base64Handler(data as string, this.props.fileType as string));
             }
           });
+          // #endif
         },
         fail(err: string) {
           reject(err);
@@ -212,9 +220,12 @@ export abstract class AbstractSignature {
    * @return {Promise<boolean>} 存储状态
    */
   async base64ToLocal(resource: DrawImage.resource) {
+    if (!resource) {
+      return false;
+    }
     // 只允许base64绘制
-    if (!resource || !/^data:.+;base64,/.test(resource)) {
-      console.error("This signature canvas allows base64 drawing only");
+    if (!/^data:.+;base64,/.test(resource)) {
+      console.warn("This signature canvas allows base64 drawing only");
       return false;
     }
     const suffix = /^data:.+\/(?<suffix>\w+);/.exec(resource)?.groups?.suffix;
@@ -234,9 +245,11 @@ export abstract class AbstractSignature {
    * ❗ 对于性能来说这很重要
    */
   killTemp() {
+    // #ifdef APP-PLUS
     try {
       this.implantImgPath && fs.unlinkSync(this.implantImgPath);
     } catch {}
+    // #endif
   }
 
   execute(x: number, y: number) {
@@ -301,22 +314,23 @@ export class DrawSignature extends AbstractSignature {
     const ctx = this.ctx;
     const { width, height } = await this.bounding;
     const [centreX, centreY] = [width! / 2, height! / 2];
-
+    // #ifndef APP-PLUS
     // 存储图片至本地
     if (!(await this.base64ToLocal(resource))) {
       return;
     }
+    resource = this.implantImgPath;
+    // #endif
     ctx.save();
 
     // 写入画布处理👇
     if (direction) {
       await this.rotate(direction, [centreX, centreY]);
-      ctx.drawImage(this.implantImgPath, -centreY, -centreX, height!, width);
+      ctx.drawImage(resource, -centreY, -centreX, height!, width);
     } else {
       // 常规绘制
-      ctx.drawImage(this.implantImgPath, 0, 0, width, height);
+      ctx.drawImage(resource, 0, 0, width, height);
     }
-
     ctx.restore();
     ctx.draw();
   }
@@ -353,7 +367,6 @@ export class DrawSignature2D extends AbstractSignature {
           reject(
             "Failed to get the node. Please check whether the canvas element is assigned an id"
           );
-
           const ctx = (node as HTMLCanvasElement).getContext("2d")! as UniCanvasContext2D;
           resolve({ canvas: node, ctx });
         })
@@ -375,7 +388,7 @@ export class DrawSignature2D extends AbstractSignature {
    * @param {number} height
    */
   initCanvas2d(ctx: UniCanvasContext2D, width: number, height: number) {
-    console.log(`xzTips：width=${width}, height=${height}`);
+    console.log(`xzTips: width=${width}, height=${height}`);
     this.canvas!.width = width! * dpr;
     this.canvas!.height = height! * dpr;
     ctx.scale(dpr, dpr);
@@ -409,12 +422,17 @@ export class DrawSignature2D extends AbstractSignature {
     const { width, height } = await this.bounding;
     const [centreX, centreY] = [width! / 2, height! / 2];
     const image = await this.canvas!.createImage();
-
+    // #ifdef APP-PLUS
+    image.src = resource ?? "";
+    // #endif
+    // #ifndef APP-PLUS
     // 存储图片至本地
     if (!(await this.base64ToLocal(resource))) {
       return;
     }
     image.src = this.implantImgPath ?? "";
+    // #endif
+
     await new Promise<void>((resolve) => {
       image.onload = () => resolve();
     });

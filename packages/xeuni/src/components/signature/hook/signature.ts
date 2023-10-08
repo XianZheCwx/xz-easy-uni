@@ -72,7 +72,7 @@ export function useSignature(
     }
     return {
       text,
-      zindex: $props.zIndex + 1,
+      zindex: Number($props.zIndex) + 1,
       show: !!$state.emptyCanvas && !$props.disabled
     };
   });
@@ -112,7 +112,7 @@ export function useSignature(
     if ($props.landscape && !landscapeOpts.show) {
       uni.showLoading({ title: "请稍等~", mask: true });
       landscapeOpts.show = true;
-      overturnSwitch($props.modelValue, "right");
+      overturnSwitch($props.modelValue as string, "right");
 
       uni.hideLoading();
       $emits("landscape", landscapeOpts.show);
@@ -177,30 +177,40 @@ export function useSignature(
       hd: $props.hd,
       style: {
         penColor: $props.penColor,
-        lineWidth: $props.lineWidth
+        lineWidth: Number($props.lineWidth)
       }
     });
 
     // 绘制实例
     switch ($props.type) {
       case "2d":
+        // #ifndef MP-WEIXIN || MP-KUAISHOU || MP-JD
+        console.warn("xzTips: 仅在微信、京东、快手小程序支持2D签名，其余平台请使用auto或native类型");
+        // #endif
         signature = new DrawSignature2D(conf);
         break;
-      default:
+      case "native":
         signature = new DrawSignature(conf);
+        break;
+      default:
+        // #ifdef MP-WEIXIN || MP-KUAISHOU || MP-JD
+        signature = new DrawSignature2D(conf);
+        // #endif
+        // #ifndef MP-WEIXIN || MP-KUAISHOU || MP-JD
+        signature = new DrawSignature(conf);
+      // #endif
     }
   }
 
-
   onBeforeMount(() => {
-    console.groupCollapsed("xzTip: signature获取实例", (new Date()).toDateString());
+    console?.groupCollapsed?.("xzTip: signature获取实例", (new Date()).toDateString());
     __init__ && __init__();
   });
 
   onMounted(() => {
     execute();
 
-    console.groupEnd();
+    console?.groupEnd?.();
   });
 
   onUnmounted(() => {

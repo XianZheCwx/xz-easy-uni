@@ -1,7 +1,7 @@
 import type { ComponentInternalInstance } from "vue";
 
 
-export type CanvasType = "native" | "2d";
+export type CanvasType = "auto" | "native" | "2d";
 
 export type UniCanvasContext = UniNamespace.CanvasContext;
 
