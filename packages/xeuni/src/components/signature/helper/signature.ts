@@ -348,7 +348,6 @@ export class DrawSignature extends AbstractSignature {
     const [centreX, centreY] = [width! / 2, height! / 2];
 
     ctx.save();
-
     // 写入画布处理👇
     if (direction) {
       await this.rotate(direction, [centreX, centreY]);

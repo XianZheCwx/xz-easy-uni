@@ -102,7 +102,6 @@
       background-color: v-bind("$props.bgc");
     }
 
-
     &__tip {
       color: v-bind("$props.tipColor")
     }

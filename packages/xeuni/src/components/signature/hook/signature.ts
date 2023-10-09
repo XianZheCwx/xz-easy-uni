@@ -164,14 +164,19 @@ export function useSignature(
   }
 
   function execute() {
-    watchEffect(() => {
+    watchEffect(async () => {
       // 主动抛出不作为画布绘入
       if (!$props.modelValue || signature.saveOutStatus) {
         return;
       }
+      // #ifdef APP-PLUS
+      if ($state.emptyCanvas) {
+        await (new Promise((resolve => setTimeout(resolve, 100))));
+      }
+      // #endif
       $state.emptyCanvas = false;
       // 画布绘入
-      signature.drawImage($props.modelValue);
+      await signature.drawImage($props.modelValue);
     });
   }
 
