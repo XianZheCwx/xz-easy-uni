@@ -30,6 +30,12 @@ export function errorHandler(
   });
 }
 
+/**
+ * 获取APP服务
+ * @param {keyof Plus} cate 目标服务类型
+ * @param {AppTarget} target 服务平台
+ * @return {Promise<T & {id: string}>}
+ */
 export async function getAppServices<T>(cate: keyof Plus, target: AppTarget) {
   const services =
     (await new Promise<(T & { id: string })[]>((resolve) => {
@@ -44,14 +50,19 @@ export async function getAppServices<T>(cate: keyof Plus, target: AppTarget) {
   return services?.find((item) => item.id === target);
 }
 
+// 获取认证授权服务
 export function getAppOauth(target: AppTarget) {
   return getAppServices<PlusOauthAuthService>("oauth", target);
 }
 
+// 获取分享服务
 export function getAppShare(target: AppTarget) {
   return getAppServices<AppShare>("share", target);
 }
 
+/**
+ * APP IO文件系统
+ */
 export class IO {
   static async resolveLocalFileSystemURL(path: string) {
     return await (new Promise((resolve, reject) => {
@@ -83,6 +94,10 @@ export class IO {
     }));
   }
 
+  /**
+   * 文件系统中的读取对象
+   * @type {any}
+   */
   static reader = class {
     private readonly file: PlusIoFile;
     private fileReader = new plus.io.FileReader!();
@@ -100,12 +115,23 @@ export class IO {
       });
     }
 
+    /**
+     * 将文件内容读取为浏览器能够直接引用的URL字符串
+     * 图片文件将转换为BASE64类型
+     * @param {string} encoding
+     * @return {Promise<string | undefined>}
+     */
     async readAsDataURL(encoding: string = "utf-8") {
       this.fileReader.readAsDataURL(this.file, encoding);
 
       return await this.result;
     }
 
+    /**
+     * 将文件内容读取为文本字符串
+     * @param {string} encoding 读取编码
+     * @return {Promise<string | undefined>} 文件内容
+     */
     async readAsText(encoding: string = "utf-8") {
       this.fileReader.readAsText(this.file, encoding);
 
