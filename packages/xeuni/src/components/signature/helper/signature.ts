@@ -1,6 +1,9 @@
 /**
  * 画布组件程序辅助
  */
+// #ifdef APP-PLUS
+import { IO } from "@/utils/plus";
+// #endif
 import type {
   CanvasType,
   UniCanvasContext2D,
@@ -12,8 +15,9 @@ import type {
 
 export const dpr = uni.getWindowInfo().pixelRatio;
 
-// #ifndef APP-PLUS
+// #ifdef MP
 export const fs: UniNamespace.FileSystemManager = uni.getFileSystemManager();
+
 // #endif
 
 export abstract class AbstractSignature {
@@ -69,14 +73,15 @@ export abstract class AbstractSignature {
 
   async getBounding(inplace = false) {
     const selector = uni.createSelectorQuery().in(this.props.self);
-    const bounding = await new Promise<UniNamespace.NodeInfo>((resolve) => {
+    const bounding = await (new Promise<UniNamespace.NodeInfo>((resolve) => {
       selector
         .select(`#${this.props.uidCanvas}`)
         .boundingClientRect((data) => {
           resolve(data as UniNamespace.NodeInfo);
         })
         .exec();
-    });
+    }));
+
     inplace && (this._bounding = bounding);
     return bounding;
   }
@@ -112,8 +117,10 @@ export abstract class AbstractSignature {
    * @param {UniCanvasContext} ctx canvas上下文
    * @param type
    */
-  setPenStyle(ctx: UniCanvasContext | UniCanvasContext2D,
-              type: CanvasType = "native") {
+  setPenStyle(
+    ctx: UniCanvasContext | UniCanvasContext2D,
+    type: CanvasType = "native"
+  ) {
     const { lineWidth, penColor } = this.styles;
     // 2d样式
     if (/^2d$/i.test(type)) {
@@ -139,6 +146,9 @@ export abstract class AbstractSignature {
     const ctx = await this.ctx;
     const angle = (90 * Math.PI) / 180;
     const [centreX, centreY] = origin;
+    // #ifdef APP-PLUS
+    await (new Promise(resolve => setTimeout(resolve, 100)));
+    // #endif
 
     // 原点定位
     ctx.translate(centreX, centreY);
@@ -165,24 +175,33 @@ export abstract class AbstractSignature {
         fileType: this.props.fileType as string,
         // 图片质量
         quality: this.props.hd ? 0 : 1,
-        success: ({ tempFilePath }: { tempFilePath: string }) => {
-          // #ifdef APP-PLUS
+        success: async ({ tempFilePath }: { tempFilePath: string }) => {
+          // #ifdef H5
+          this._saveOutStatus = true;
           resolve(tempFilePath);
           // #endif
-          // #ifndef APP-PLUS
+          // #ifdef APP-PLUS
+          const file = await IO.getFile(tempFilePath);
+          if (file) {
+            const reader = new IO.reader(file);
+            this._saveOutStatus = true;
+            resolve(await reader.readAsDataURL() as string);
+          }
+          reject("xzTips: file is empty");
+          // #endif
+          // #ifdef MP
           fs.readFile({
             filePath: tempFilePath,
             encoding: "base64",
             success: ({ data }) => {
               this._saveOutStatus = true;
               resolve(base64Handler(data as string, this.props.fileType as string));
-            }
+            },
+            fail: ({ errMsg }) => reject(errMsg)
           });
           // #endif
         },
-        fail(err: string) {
-          reject(err);
-        }
+        fail: (err: string) => reject(err)
       };
 
       // 指定宽高
@@ -309,30 +328,41 @@ export class DrawSignature extends AbstractSignature {
    * @param direction
    * @return {Promise<void>}
    */
-  async drawImage(resource: DrawImage.resource,
-                  direction?: DrawImage.direction) {
-    const ctx = this.ctx;
-    const { width, height } = await this.bounding;
-    const [centreX, centreY] = [width! / 2, height! / 2];
-    // #ifndef APP-PLUS
+  async drawImage(
+    resource: DrawImage.resource,
+    direction?: DrawImage.direction
+  ) {
+    // #ifdef MP
     // 存储图片至本地
     if (!(await this.base64ToLocal(resource))) {
       return;
     }
     resource = this.implantImgPath;
     // #endif
+
+    if (!resource) {
+      return;
+    }
+    const ctx = this.ctx;
+    const { width, height } = await this.bounding;
+    const [centreX, centreY] = [width! / 2, height! / 2];
+
     ctx.save();
 
     // 写入画布处理👇
     if (direction) {
       await this.rotate(direction, [centreX, centreY]);
       ctx.drawImage(resource, -centreY, -centreX, height!, width);
+
     } else {
       // 常规绘制
       ctx.drawImage(resource, 0, 0, width, height);
     }
     ctx.restore();
-    ctx.draw();
+
+    await (new Promise<void>((resolve) => {
+      ctx.draw(false, () => resolve());
+    }));
   }
 }
 
@@ -364,9 +394,8 @@ export class DrawSignature2D extends AbstractSignature {
         .select(`#${this.props.uidCanvas}`)
         .node(({ node } = {}) => {
           !node &&
-          reject(
-            "Failed to get the node. Please check whether the canvas element is assigned an id"
-          );
+          reject("xzTips: Failed to get the node. Please check whether the canvas element is assigned an id");
+
           const ctx = (node as HTMLCanvasElement).getContext("2d")! as UniCanvasContext2D;
           resolve({ canvas: node, ctx });
         })
@@ -422,10 +451,10 @@ export class DrawSignature2D extends AbstractSignature {
     const { width, height } = await this.bounding;
     const [centreX, centreY] = [width! / 2, height! / 2];
     const image = await this.canvas!.createImage();
-    // #ifdef APP-PLUS
+    // #ifdef APP-PLUS || H5
     image.src = resource ?? "";
     // #endif
-    // #ifndef APP-PLUS
+    // #ifdef MP
     // 存储图片至本地
     if (!(await this.base64ToLocal(resource))) {
       return;

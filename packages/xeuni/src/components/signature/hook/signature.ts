@@ -1,7 +1,7 @@
 import {
+  unref,
   computed,
   getCurrentInstance,
-  nextTick,
   onBeforeMount,
   onMounted,
   onUnmounted,
@@ -49,10 +49,23 @@ export function useSignature(
   });
 
   const nuCanvasType = computed(() => {
-    if (["native"].includes($props.type)) {
-      return "";
+    let type = "";
+
+    switch ($props.type) {
+      case "native":
+        break;
+      case "2d":
+        // #ifndef MP-WEIXIN || MP-KUAISHOU || MP-JD
+        console.warn("xzTips: 仅在微信、京东、快手小程序支持2D签名，其余平台请使用auto或native类型");
+        // #endif
+        type = $props.type;
+        break;
+      default:
+        // #ifdef MP-WEIXIN || MP-KUAISHOU || MP-JD
+        type = "2d";
+      // #endif
     }
-    return $props.type;
+    return type;
   });
 
   // 提示上下文
@@ -91,16 +104,10 @@ export function useSignature(
   });
 
   // 横竖屏切换
-  function overturnSwitch(base64: string, direction?: "left" | "right") {
-    return new Promise<void>((resolve) => {
-      // 需要DOM切换完毕后获取宽高
-      nextTick(async () => {
-        await signature.clear();
-        await signature.reset();
-        await signature.drawImage(base64, direction);
-        resolve();
-      });
-    });
+  async function overturnSwitch(base64: string, direction?: "left" | "right") {
+    await signature.clear();
+    await signature.reset();
+    await signature.drawImage(base64, direction);
   }
 
   function drawEvent(e: UniTouchEvent, isstart: boolean) {
@@ -136,7 +143,6 @@ export function useSignature(
 
   async function saveEvent() {
     await uni.showLoading({ title: "正在保存中~", mask: true });
-
     if ($props.landscape) {
       // 横屏画布base64
       const lbase64 = await signature.save();
@@ -182,23 +188,14 @@ export function useSignature(
     });
 
     // 绘制实例
-    switch ($props.type) {
+    switch (unref(nuCanvasType)) {
       case "2d":
-        // #ifndef MP-WEIXIN || MP-KUAISHOU || MP-JD
-        console.warn("xzTips: 仅在微信、京东、快手小程序支持2D签名，其余平台请使用auto或native类型");
-        // #endif
         signature = new DrawSignature2D(conf);
-        break;
-      case "native":
-        signature = new DrawSignature(conf);
+        console.log("xzTips: canvas使用2d模式");
         break;
       default:
-        // #ifdef MP-WEIXIN || MP-KUAISHOU || MP-JD
-        signature = new DrawSignature2D(conf);
-        // #endif
-        // #ifndef MP-WEIXIN || MP-KUAISHOU || MP-JD
         signature = new DrawSignature(conf);
-      // #endif
+        console.log("xzTips: canvas使用原生模式");
     }
   }
 
