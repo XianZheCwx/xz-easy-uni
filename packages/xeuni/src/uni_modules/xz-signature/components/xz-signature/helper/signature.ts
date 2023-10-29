@@ -2,7 +2,7 @@
  * 画布组件程序辅助
  */
 // #ifdef APP-PLUS
-import { IO } from "@/utils/plus";
+import { IO } from "../utils/plus";
 // #endif
 import type {
   CanvasType,
@@ -17,7 +17,6 @@ export const dpr = uni.getWindowInfo().pixelRatio;
 
 // #ifdef MP
 export const fs: UniNamespace.FileSystemManager = uni.getFileSystemManager();
-
 // #endif
 
 export abstract class AbstractSignature {

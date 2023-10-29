@@ -1,12 +1,25 @@
-import type { ExtractPropTypes } from "vue";
-
-import {
-  lieProp,
-  truthProp,
-  makeNumericProp,
-  makeStringProp
-} from "@/utils";
+import type { ExtractPropTypes, PropType } from "vue";
 import type { CanvasType } from "../types";
+
+const numericProp = [Number, String];
+
+const truthProp = {
+  type: Boolean,
+  default: true as const
+};
+
+const lieProp = {
+  type: Boolean,
+  default: false as const
+};
+
+const makeNumericProp = <T>(defVal: T) => {
+  return { type: numericProp, default: defVal };
+};
+
+const makeStringProp = <T>(defVal: T) => {
+  return { type: String as unknown as PropType<T>, default: defVal };
+};
 
 export const signatureProps = {
   // 画布值
@@ -41,7 +54,7 @@ export const signatureProps = {
   type: makeStringProp<CanvasType>("auto"),
   // 签名提示贴士
   tip: String,
-  // 签名提示贴士
+  // 签名提示贴士颜色
   tipColor: makeStringProp("#9D9D9D"),
   // 是否显示清除按钮
   showClearBtn: truthProp,

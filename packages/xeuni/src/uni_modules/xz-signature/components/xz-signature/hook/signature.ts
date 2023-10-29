@@ -154,7 +154,7 @@ export function useSignature(
     const base64 = await signature.save();
     uni.hideLoading();
 
-    $emits("save", base64);
+      $emits("save", base64);
     $emits("update:modelValue", base64);
   }
 
