@@ -126,7 +126,7 @@ export function useSignature(
       return;
     }
 
-    const { x, y } = e?.touches?.[0];
+    const { x, y } = e?.touches?.[e.touches.length - 1];
     $state.emptyCanvas = false;
     signature.execute(x, y);
 
