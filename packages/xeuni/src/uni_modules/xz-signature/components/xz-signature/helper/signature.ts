@@ -14,7 +14,7 @@ import type {
   SignatureCanvasCtx
 } from "../types";
 
-export const dpr = uni.getWindowInfo().pixelRatio;
+export const dpr = getDpr();
 
 // #ifdef MP
 export const fs: UniNamespace.FileSystemManager = uni.getFileSystemManager();
@@ -551,4 +551,13 @@ export function writeFile(
       fail: reject
     });
   });
+}
+
+export function getDpr() {
+  // 微信8.0.14版本以上可用
+  if (uni.canIUse("getWindowInfo")) {
+    return uni.getWindowInfo().pixelRatio;
+  }
+  const { pixelRatio } = uni.getSystemInfoSync();
+  return pixelRatio;
 }
