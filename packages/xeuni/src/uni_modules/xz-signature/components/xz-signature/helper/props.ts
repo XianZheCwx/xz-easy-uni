@@ -26,6 +26,8 @@ export const signatureProps = {
   modelValue: String,
   // 画布背景颜色
   bgc: makeStringProp("#FFF"),
+  // 是否为真实背景色，将随着签名一起生成，默认为透明通道图片
+  realBgc: lieProp,
   // 取消按钮文案
   cancelText: makeStringProp("清空"),
   // 确定按钮文案

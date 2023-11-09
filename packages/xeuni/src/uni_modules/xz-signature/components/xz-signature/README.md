@@ -132,6 +132,7 @@ xz-signature  是基于 uniapp 框架的一款签名功能组件，组件干练�
 |:-------------------:|:-------:|:----------:|:--------:|
 | modelValue(v-model) | string  |    `""`    |    Base64 图片值    |
 |   bgc   | string  | `#F0F0F0`  |  画布背景颜色  |
+| **realBgc** | boolean | `false` | 是否为真实背景色，将随着签名一起生成，默认为透明通道图片 |
 | cancelText | string  |   `"清空"`   |  取消按钮文案  |
 |     confirmText     | string  |   `"保存"`   |  确定按钮文案  |
 |      disabled       | boolean |  `false`   |   是否禁用   |
@@ -187,6 +188,14 @@ xz-signature  是基于 uniapp 框架的一款签名功能组件，组件干练�
 | :--------: | :--------: | :-------------------------------------------------------: |
 | saveEvent  | () => void | 保存当前画布内容并触发 `update:modelValue` 与 `save` 事件 |
 | clearEvent | () => void |        清空当前画布内容，并触发 `clearEvent` 事件         |
+
+
+
+---
+
+## 七、注意事项
+
+- <font color=bold>微信小程序 2d 画布模式下，微信开发者工具老版本可能存在一些显示上的错误，如画布优先级覆盖、占位符不显示等，这些在真机上都是不存在的，**开发时请以真机为准**！</font>
 
 
 

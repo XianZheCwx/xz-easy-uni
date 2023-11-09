@@ -10,13 +10,15 @@ import type {
   UniCanvasContext,
   UniCanvasElement,
   SignatureConfs,
-  DrawImage
+  DrawImage,
+  SignatureCanvasCtx
 } from "../types";
 
 export const dpr = uni.getWindowInfo().pixelRatio;
 
 // #ifdef MP
 export const fs: UniNamespace.FileSystemManager = uni.getFileSystemManager();
+
 // #endif
 
 export abstract class AbstractSignature {
@@ -53,7 +55,7 @@ export abstract class AbstractSignature {
   }
 
   // 获取画布实例
-  get ctx(): UniCanvasContext | UniCanvasContext2D | Promise<UniCanvasContext2D> {
+  get ctx(): SignatureCanvasCtx {
     return uni.createCanvasContext(this.props?.uidCanvas as string, this.props?.self);
   }
 
@@ -76,7 +78,7 @@ export abstract class AbstractSignature {
       selector
         .select(`#${this.props.uidCanvas}`)
         .boundingClientRect((data) => {
-          resolve(data as UniNamespace.NodeInfo);
+          resolve(data as UniNamespace.NodeInfo ?? {});
         })
         .exec();
     }));
@@ -115,21 +117,23 @@ export abstract class AbstractSignature {
    * 设置画笔样式
    * @param {UniCanvasContext} ctx canvas上下文
    * @param type
+   * @param style
    */
   setPenStyle(
     ctx: UniCanvasContext | UniCanvasContext2D,
-    type: CanvasType = "native"
+    type: CanvasType = "native",
+    style?: Record<string, unknown>
   ) {
-    const { lineWidth, penColor } = this.styles;
+    const { lineWidth, penColor, fillStyle } = style ?? this.styles;
     // 2d样式
     if (/^2d$/i.test(type)) {
       ctx.lineCap = "round";
-      Object.assign(ctx, { lineWidth, fillStyle: penColor });
+      Object.assign(ctx, { lineWidth, fillStyle: penColor ?? fillStyle });
       return;
     }
     (ctx as UniCanvasContext).setLineCap("round");
-    lineWidth && (ctx as UniCanvasContext).setLineWidth(lineWidth);
-    penColor && (ctx as UniCanvasContext).setFillStyle(penColor);
+    lineWidth && (ctx as UniCanvasContext).setLineWidth(lineWidth as number);
+    penColor && (ctx as UniCanvasContext).setFillStyle((penColor ?? fillStyle) as string);
   }
 
   /* ---------------------------------------------------------------- */
@@ -217,17 +221,39 @@ export abstract class AbstractSignature {
     });
   }
 
+  async drawTask(
+    exec: (
+      ctx: UniCanvasContext | UniCanvasContext2D,
+      width: number,
+      height: number
+    ) => void,
+    defaultwh: number = 1000
+  ) {
+    const ctx = await this.ctx;
+    const { width = defaultwh, height = defaultwh } = await this.bounding;
+
+    exec(ctx, width, height);
+    "draw" in ctx && ctx.draw?.();
+  }
+
   /**
    * 清空画布
    * ❗ 这是一个异步操作，需要获取画布宽高
-   * @param {number} tolerance 公差
+   * @param {number} offset 偏差
    */
-  async clear(tolerance = 10) {
-    const ctx = await this.ctx;
-    const { width = 1000, height = 1000 } = await this.bounding;
+  clear(offset = 10) {
+    this.drawTask((ctx, width, height) => {
+      ctx.clearRect(0, 0, width + offset, height + offset);
+    });
+  }
 
-    ctx.clearRect(0, 0, width + tolerance, height + tolerance);
-    "draw" in ctx && ctx.draw?.();
+  async drawBgc(bgc: string, offset = 10, type: CanvasType = "native") {
+    this.drawTask((ctx, width, height) => {
+      this.setPenStyle(ctx, type, { fillStyle: bgc });
+      ctx.fillRect(0, 0, width + offset, height + offset);
+      // 恢复默认画笔样式
+      this.setPenStyle(ctx, type);
+    });
   }
 
   /* ---------------------------------------------------------------- */
@@ -362,6 +388,10 @@ export class DrawSignature extends AbstractSignature {
       ctx.draw(false, () => resolve());
     }));
   }
+
+  drawBgc(bgc: string, offset?: number) {
+    return super.drawBgc(bgc, offset, "native");
+  }
 }
 
 /**
@@ -473,6 +503,10 @@ export class DrawSignature2D extends AbstractSignature {
       ctx.drawImage(image, 0, 0, width!, height!);
     }
     ctx.restore();
+  }
+
+  drawBgc(bgc: string, offset?: number) {
+    return super.drawBgc(bgc, offset, "2d");
   }
 
   async save(type: CanvasType = "2d") {

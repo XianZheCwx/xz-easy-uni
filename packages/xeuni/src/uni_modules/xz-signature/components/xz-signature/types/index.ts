@@ -7,6 +7,11 @@ export type UniCanvasContext = UniNamespace.CanvasContext;
 
 export type UniCanvasContext2D = CanvasRenderingContext2D;
 
+export type SignatureCanvasCtx =
+  UniCanvasContext
+  | UniCanvasContext2D
+  | Promise<UniCanvasContext2D>;
+
 export type UniTouchEvent =
   TouchEvent
   & { touches: (Touch & { x: number; y: number })[] };

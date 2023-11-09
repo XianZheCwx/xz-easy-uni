@@ -107,6 +107,10 @@ export function useSignature(
   async function overturnSwitch(base64: string, direction?: "left" | "right") {
     await signature.clear();
     await signature.reset();
+    // 空值且开启真实背景
+    if (!$props.modelValue && $props.realBgc) {
+      await signature.drawBgc($props.bgc);
+    }
     await signature.drawImage(base64, direction);
   }
 
@@ -154,7 +158,7 @@ export function useSignature(
     const base64 = await signature.save();
     uni.hideLoading();
 
-      $emits("save", base64);
+    $emits("save", base64);
     $emits("update:modelValue", base64);
   }
 
@@ -164,6 +168,9 @@ export function useSignature(
   }
 
   function execute() {
+    // 初始化真实背景色
+    $props.realBgc && signature.drawBgc($props.bgc);
+
     watchEffect(async () => {
       // 主动抛出不作为画布绘入
       if (!$props.modelValue || signature.saveOutStatus) {
