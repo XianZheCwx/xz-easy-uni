@@ -11,9 +11,13 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "pnpm -C ./packages/xeuni start"
+    "start": "turbo run start:mp-weixin --continue",
+    "start:app": "turbo run start:app --continue"
   },
   "keywords": [],
   "author": "",
-  "license": "GPL3.0"
+  "license": "GPL3.0",
+  "devDependencies": {
+    "turbo": "^1.10.13"
+  }
 }

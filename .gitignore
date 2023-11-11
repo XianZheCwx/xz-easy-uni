@@ -6,3 +6,6 @@ node_modules/
 
 # 编译生成文件
 dist/
+
+# turbo 缓存文件
+**/.turbo
