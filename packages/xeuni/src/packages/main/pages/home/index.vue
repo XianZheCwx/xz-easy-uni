@@ -1,9 +1,11 @@
 <template>
   <view class="content">
+    这里是主页
     <image class="logo" src="/static/logo.png" />
     <view class="text-area">
       <text class="title">{{ title }}</text>
     </view>
+    <navigator open-type="navigate" url="/demo-pages/signature/index">点击</navigator>
   </view>
 </template>
 

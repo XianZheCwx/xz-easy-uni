@@ -27,7 +27,7 @@
     "list": [
       {
         "text": "首页",
-        "pagePath": "pages/home/index",
+        "pagePath": "packages/main/pages/home/index",
         "iconfont": {
           "text": "",
           "fontSize": "12px"
@@ -35,39 +35,39 @@
       },
       {
         "text": "文章资讯",
-        "pagePath": "pages/blogs/index"
+        "pagePath": "packages/main/pages/blogs/index"
       },
       {
         "text": "工作台",
-        "pagePath": "pages/workbench/index"
+        "pagePath": "packages/main/pages/workbench/index"
       },
       {
         "text": "我的",
-        "pagePath": "pages/mine/index"
+        "pagePath": "packages/main/pages/mine/index"
       }
     ]
   },
   "pages": [
     {
-      "path": "pages/home/index",
+      "path": "packages/main/pages/home/index",
       "style": {
         "navigationBarTitleText": "首页"
       }
     },
     {
-      "path": "pages/blogs/index",
+      "path": "packages/main/pages/blogs/index",
       "style": {
         "navigationBarTitleText": "文章资讯"
       }
     },
     {
-      "path": "pages/workbench/index",
+      "path": "packages/main/pages/workbench/index",
       "style": {
         "navigationBarTitleText": "工作台"
       }
     },
     {
-      "path": "pages/mine/index",
+      "path": "packages/main/pages/mine/index",
       "style": {
         "navigationBarTitleText": "我的"
       }
@@ -75,7 +75,7 @@
   ],
   "subPackages": [
     {
-      "root": "demo-pages",
+      "root": "packages/demo/pages",
       "pages": [
         {
           "path": "home/index",

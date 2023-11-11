@@ -1,6 +1,6 @@
 <template>
   <view class="mine">
-
+    这里是我的
   </view>
 </template>
 
