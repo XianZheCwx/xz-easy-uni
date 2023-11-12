@@ -1,461 +1,279 @@
 <template>
-  <view class="signature">
-    <view class="signature__main">
-      <canvas :id="$state.uidCanvas"
-              hidpi
-              disable-scroll
-              :canvas-id="$state.uidCanvas"
-              :class="{ 'signature__canvas--disabled': $props.disabled }"
-              class="signature__canvas"
-              @touchstart="drawEvent($event, true)"
-              @touchmove="drawEvent"
-              @touchend="drawEndEvent" />
-      <!-- 内容占位 -->
-      <view v-if="showPlaceholder"
-            class="signature__placeholder">
-        <text>{{ $props.placeholder }}</text>
-      </view>
-    </view>
-    <view class="signature__operation">
-      <view class="signature__tip">
-        <slot name="tip">
-          <text v-if="$props.tip">{{ $props.tip }}</text>
+  <uni-popup
+    :ref="(el) => ($refs.popup = el)"
+    :type="$props.type"
+    background-color="#FFF"
+    @mask-click="closeEvent">
+    <view class="cascader">
+      <view class="cascader-hd">
+        <slot name="header">
+          <view v-if="$props.type === 'bottom'"
+                class="cascader-hd_inner">
+            <text class="cascader__title">{{ $props.title }}</text>
+            <uni-icons
+              v-if="$props.close"
+              :type="$props.closeIcon"
+              size="1.35em"
+              @click.stop="closeEvent"/>
+          </view>
         </slot>
       </view>
-      <view class="signature__btn-container">
-        <button size="mini"
-                class="signature__btn"
-                :disabled="$props.disabled"
-                @click="cancelEvent">
-          {{ $props.cancelText }}
-        </button>
-        <button size="mini"
-                type="primary"
-                class="signature__btn"
-                :disabled="$props.disabled"
-                @click="saveEvent">
-          {{ $props.confirmText }}
-        </button>
+      <view class="cascader__bd">
+        <!-- 选项面包屑 -->
+        <cascader-breadcrumb
+          :ref="(el) => ($refs.breadcrumb = el)"
+          :options="nuBreadcrumb"
+          :color="$props.color"
+          @change="breadcrumbEvent"/>
+        <!-- 选项列 -->
+        <cascader-list v-model="cascaderOpts.checked"
+                       :check-strictly="nuProps.checkStrictly"
+                       :options="currCatalog"
+                       @checked="listCheckEvent"
+                       @change="listChangeEvent"/>
+      </view>
+      <view class="cascader__ft">
+        <slot name="footer"/>
       </view>
     </view>
-  </view>
+  </uni-popup>
+  <!-- 加载动画 -->
+  <loading-circle :show="$state.loading"
+                  :color="$props.color"
+                  :z-index="$props.zindex + 1"/>
 </template>
 
+<script lang="ts">
+export default {
+  options: {
+    styleIsolation: "shared"
+  }
+};
+</script>
+
 <script lang="ts" setup>
-  /*
-   * 组件名: signature
-   * 组件用途: 签名组件（只用于签名）
-   * 创建日期: 2023/5/26
-   * 编写者: XianZhe
-   */
-  import { computed, reactive, onMounted, onUnmounted, watchEffect, getCurrentInstance } from "vue";
-  import type { PropType } from "vue";
+/*
+ * 组件名: cascader
+ * 组件用途: 级联组件
+ * 创建日期: 2023/5/19
+ * 编写者: XianZhe
+ */
+import {
+  computed, reactive, watch,
+  watchEffect, provide, toRaw,
+  type PropType,
+  type ComponentInternalInstance
+} from "vue";
 
-  type UniTouchEvent = TouchEvent & { touches: (Touch & { x: number; y: number })[] };
+import type {CascaderOpts, CascaderNode, CascaderAdvancedProps, CascaderRawNode, Type} from "./types/index";
+import {cascaderProps, cascaderEmits} from "./helper/props"
+import {VirtualNode} from "./helper/cascader";
+import LoadingCircle from "@/components/loading/circle";
+import CascaderList from "./components/list";
+import CascaderBreadcrumb from "./components/breadcrumb";
 
-  const $refs = reactive({
-    self: getCurrentInstance()
+interface State {
+  [state: string]: unknown;
+
+  loading: boolean;
+  virtualCascader: VirtualNode;
+}
+
+const $refs: {
+  [instance: string]:
+    | (ComponentInternalInstance & { [func: string]: (...args: unknown[]) => unknown })
+    | null;
+} = reactive({
+  popup: null,
+  breadcrumb: null
+});
+const $props = defineProps(cascaderProps);
+const $emits = defineEmits(cascaderEmits);
+const $state: State = reactive({
+  loading: false,
+  virtualCascader: new VirtualNode($props.props)
+});
+
+const cascaderOpts: CascaderOpts = reactive({
+  // 唯一列加载索引id
+  uid: "",
+  source: [],
+  // 选中项
+  // ❗ 异步加载情况下只能选择根节点数据
+  checked: "",
+  hash: {},
+  originalHash: {},
+  breadcrumb: []
+});
+
+const nuProps = computed<CascaderAdvancedProps>(() => {
+  const p = {
+    multiple: false,
+    checkStrictly: false,
+    lazy: false,
+    label: "label",
+    value: "value",
+    children: "children",
+    isleaf: "isleaf"
+  };
+  return Object.assign(p, $props.props);
+});
+
+const nuBreadcrumb = computed<CascaderRawNode[]>(() => {
+  return cascaderOpts.breadcrumb.map((item) => {
+    return cascaderOpts.hash?.[item];
   });
-  const $props = defineProps({
-    // 画布值
-    modelValue: {
-      type: String,
-      default: ""
-    },
-    // 画布背景颜色
-    backgroundColor: {
-      type: String,
-      default: "#F0F0F0"
-    },
-    // 取消按钮文案
-    cancelText: {
-      type: String,
-      default: "清空"
-    },
-    // 确定按钮文案
-    confirmText: {
-      type: String,
-      default: "保存"
-    },
-    // 是否禁用
-    disabled: {
-      type: Boolean,
-      default: false
-    },
-    // 导出文件类型
-    fileType: {
-      type: String as PropType<"png" | "jepg">,
-      default: "png"
-    },
-    // 画布宽度
-    width: {
-      type: String,
-      default: "100%"
-    },
-    // 画布高度
-    height: {
-      type: String,
-      default: "200px"
-    },
-    // 画笔宽度（大小）
-    lineWidth: {
-      type: Number,
-      default: 5
-    },
-    // 画笔颜色
-    penColor: {
-      type: String,
-      default: "#000"
-    },
-    // 签名占位内容
-    placeholder: {
-      type: String,
-      default: "滑动此处签名"
-    },
-    // 签名提示贴士
-    tip: {
-      type: String,
-      default: ""
-    },
-    // 画布优先层级
-    zIndex: {
-      type: Number,
-      default: 9
-    }
-  });
-  const $state = reactive({
-    uidCanvas: `signature-${Math.trunc(Math.random() * 1000000)}`,
-    emptyCanvas: true
-  });
-  const $emits = defineEmits(["update:modelValue", "save", "cancel", "start", "end", "signing"]);
+});
 
-  // canvas 上下文
-  const canvas = computed(() => {
-    return uni.createCanvasContext($state.uidCanvas, $refs?.self);
-  });
+const currCatalog = computed(() => {
+  if (cascaderOpts.uid) {
+    return cascaderOpts.hash?.[cascaderOpts.uid]?.children;
+  }
+  return cascaderOpts.source;
+});
 
-  // 强制标准文件类型
-  const nuFileType = computed<"png" | "jepg">(() => {
-    if (/^(png|jepg)$/.test($props.fileType)) {
-      return $props.fileType;
-    }
-    console.warn(`不支持${$props.fileType}文件类型`);
-    return "png";
-  });
+/**
+ * 节点解析
+ */
+function nodeparse(source: CascaderNode[]): CascaderRawNode[] {
+  // 哨兵节点
+  const virtualNode = $state.virtualCascader.parseRecursion(source);
+  const sentinel: CascaderRawNode[] = [{value: "__root__", children: virtualNode} as CascaderRawNode];
 
-  const showPlaceholder = computed<boolean>(() => {
-    return $state.emptyCanvas && !$props.disabled;
-  });
+  // 原始数据存储
+  cascaderOpts.source = virtualNode;
+  $state.virtualCascader.hashRecursion(sentinel, cascaderOpts.hash);
+  // 懒加载状态下创建源数据哈希表
+  $state.virtualCascader.hashRecursion(source, cascaderOpts.originalHash, {fields: true});
+  return virtualNode;
+}
 
-  const placeholderZindex = computed<number>(() => {
-    return $props.zIndex + 1;
-  });
+function closeEvent() {
+  $refs.popup?.close?.();
+  $emits("update:show", false);
+  $emits("close");
+}
 
-  class DrawSignature {
-    // 是否为保存输出
-    private static _saveOutStatus = false;
-    private static _beginTime: null | number = null;
-    // 画布布局位置单例
-    private static _bounding: UniNamespace.NodeInfo | null = null;
-    private static fs: UniNamespace.FileSystemManager = uni.getFileSystemManager();
+// 列选中事件
+function listCheckEvent(item: CascaderRawNode) {
+  $emits("checked", cascaderOpts.hash?.[item.value]);
+  $emits("update:modelValue", item.value);
+}
 
-    // 指针存储
-    static prev: number[] = [];
-    static curr: number[] = [];
-    // 嵌入图片路径
-    static implantImgPath = "";
+function setCurrContext(uid: string | number) {
+  cascaderOpts.uid = uid;
+  $refs.breadcrumb?.resetManualLevel?.();
+}
 
-    static get _draw() {
-      return canvas.value;
-    }
+// 列更改事件
+async function listChangeEvent(node: CascaderRawNode) {
+  const uid = node.value;
+  const originaNode = cascaderOpts.originalHash?.[uid];
 
-    static get saveOutStatus() {
-      const status = this._saveOutStatus;
-      this._saveOutStatus = false;
-      return status;
-    }
+  // 更改面包屑
+  cascaderOpts.breadcrumb.splice(node.level, cascaderOpts.breadcrumb.length - node.level, uid);
 
-    static get bounding() {
-      return this.getBounding();
-    }
+  const event = {
+    node: originaNode,
+    rawNode: toRaw(node),
+    path: toRaw(nuBreadcrumb.value) ?? []
+  };
 
-    static async getBounding() {
-      if (!this._bounding) {
-        const selector = uni.createSelectorQuery().in($refs.self);
-        this._bounding = await new Promise<UniNamespace.NodeInfo>((resolve) => {
-          selector
-            .select(`#${$state.uidCanvas}`)
-            .boundingClientRect((data) => {
-              resolve(data as UniNamespace.NodeInfo);
-            })
-            .exec();
-        });
-      }
-      return this._bounding;
-    }
-
-    /**
-     * 保存画布
-     * @return {Promise<string>} base64字符集
-     */
-    static async save(): Promise<string> {
-      const extractBase64 = new Promise<string>((resolve, reject) => {
-        uni.canvasToTempFilePath(
-          {
-            canvasId: $state.uidCanvas,
-            fileType: nuFileType.value,
-            // 图片质量
-            quality: 1,
-            success: ({ tempFilePath }) => {
-              this.fs.readFile({
-                filePath: tempFilePath,
-                encoding: "base64",
-                success: ({ data }) => {
-                  this._saveOutStatus = true;
-                  resolve(base64Handler(data as string));
-                }
-              });
-            },
-            fail(err) {
-              reject(err);
-            }
-          },
-          $refs.self
-        );
-      });
-      return await extractBase64;
-    }
-
-    /**
-     * 设置画笔样式
-     * @param {UniNamespace.CanvasContext} draw canvas上下文
-     */
-    static setPenStyle(draw: UniNamespace.CanvasContext) {
-      draw.setLineCap("round");
-      draw.setLineWidth($props.lineWidth);
-      draw.setFillStyle($props.penColor);
-    }
-
-    /**
-     * 设置指针
-     * @param {number} x x轴坐标
-     * @param {number} y y轴坐标
-     */
-    static setPointer(x: number, y: number) {
-      this.prev = this.curr;
-      this.curr = [x, y];
-      if (this.prev?.length <= 0) {
-        this.prev = this.curr;
-      }
-    }
-
-    /**
-     * 绘制画布
-     */
-    static drawer() {
-      const draw = this._draw;
-      const [x1, y1, x2, y2] = [].concat(this.prev, this.curr);
-
-      draw.beginPath();
-      this.setPenStyle(draw);
-      draw.moveTo(x1, y1);
-      draw.quadraticCurveTo(x1, y1, x2, y2);
-
-      // 下笔绘图
-      draw.stroke();
-      draw.draw(true);
-    }
-
-    /**
-     * 绘制图像到画布
-     * @param {string} resource
-     * @return {Promise<void>}
-     */
-    static async drawerImage(resource?: string) {
-      // 只允许base64绘制
-      if (!resource || !/^data:.+;base64,/.test(resource)) {
-        console.error("This signature canvas allows base64 drawing only");
+  // 子节点下触发完成处理
+  if (node?.isleaf) {
+    $emits("finish", event);
+    // 懒加载模式
+    if (nuProps.value.lazy) {
+      $state.loading = true;
+      // 等待节点异步加载
+      const waitRes = await $state.virtualCascader.sleepLazyLoad(uid, cascaderOpts.hash);
+      $state.loading = false;
+      // 获取到下一节点则直接返回
+      if (waitRes) {
+        setCurrContext(uid);
+        $emits("change", event);
         return;
       }
-      this.killTemp();
-
-      const draw = this._draw;
-      const suffix = /^data:.+\/(?<suffix>\w+);/.exec(resource)?.groups?.suffix;
-      const { width, height } = await this.bounding;
-
-      this.implantImgPath =
-        (uni as Uni & { env: { USER_DATA_PATH: string } })?.env?.USER_DATA_PATH +
-        `/${new Date().getTime()}.` +
-        suffix ?? "png";
-      // 写入本地文件
-      this.fs.writeFile({
-        filePath: this.implantImgPath,
-        data: resource.replace(/^data.+;base64,/, ""),
-        encoding: "base64",
-        success: () => {
-          draw.drawImage(this.implantImgPath, 0, 0, width, height);
-          draw.draw(true);
-        },
-        fail: (e) => {
-          console.error(e);
-        }
-      });
+      // 获取失败回滚面包屑
+      cascaderOpts.breadcrumb.splice(node.level, cascaderOpts.breadcrumb.length - node.level);
     }
 
-    /**
-     * 清除缓存
-     * ❗ 对于性能来说这很重要
-     */
-    static killTemp() {
-      this.implantImgPath && this.fs.unlinkSync(this.implantImgPath);
+    // 再无子节点则选中
+    // node.checked = !node.checked;
+    if (cascaderOpts.checked === node.value) {
+      cascaderOpts.checked = "";
+    } else {
+      cascaderOpts.checked = node.value;
     }
 
-    /**
-     * 清空画布
-     * ❗ 这是一个异步操作，需要获取画布宽高
-     * @param {number} tolerance 公差
-     */
-    static async clear(tolerance = 10) {
-      const { width = 1000, height = 1000 } = await this.bounding;
-      this._draw.clearRect(0, 0, width + tolerance, height + tolerance);
-      this._draw.draw();
+    // 非严格模式
+    if (!nuProps.value.checkStrictly) {
+      $emits("checked", event);
+      $emits("update:show", false);
     }
 
-    /**
-     * 完成绘制处理
-     */
-    static finish() {
-      this._beginTime = null;
-      this.prev = [];
-      this.curr = [];
+    return;
+  }
+
+  // 变更节点处理
+  setCurrContext(node.value);
+  $emits("change", event);
+}
+
+function breadcrumbEvent(node: CascaderRawNode, index: number) {
+  $emits("clickTab");
+
+  // 根节点特殊处理
+  if (index === 0 || !node) {
+    cascaderOpts.uid = "__root__";
+    return;
+  }
+  cascaderOpts.uid = node.value;
+}
+
+function execute() {
+  // 数据解析
+  nodeparse($props.options);
+}
+
+provide(
+  "_ricon",
+  computed(() => {
+    return $props.ricon?.trim();
+  })
+);
+
+watchEffect(() => {
+  execute();
+});
+
+watchEffect(() => {
+  cascaderOpts.checked = $props.modelValue;
+});
+
+watchEffect(() => {
+  $state.virtualCascader = new VirtualNode(nuProps.value);
+});
+
+watch(
+  () => $props.show,
+  () => {
+    if ($props.show) {
+      return $refs.popup?.open?.();
     }
-
-    static execute(x: number, y: number) {
-      const _endTime = new Date().getTime();
-      if (this._beginTime && _endTime - this._beginTime < 10) {
-        return;
-      }
-      this._beginTime = _endTime;
-
-      this.setPointer(x, y);
-      this.drawer();
-    }
+    $refs.popup?.close?.();
   }
+);
 
-  function base64Handler(coding: string) {
-    const suffix = nuFileType.value;
-    return `data:image/${suffix};base64,` + coding;
-  }
-
-  function drawEvent(e: UniTouchEvent, isstart: boolean) {
-    // 禁用状态
-    if ($props.disabled) {
-      return;
-    }
-
-    const { x, y } = e?.touches?.[0];
-    $state.emptyCanvas = false;
-    DrawSignature.execute(x, y);
-    if (isstart) {
-      return $emits("start", e);
-    }
-    $emits("signing", e);
-  }
-
-  function drawEndEvent(e: UniTouchEvent) {
-    DrawSignature.finish();
-    $emits("end", e);
-  }
-
-  async function saveEvent() {
-    const base64 = await DrawSignature.save();
-    $emits("save", base64);
-    $emits("update:modelValue", base64);
-  }
-
-  function cancelEvent() {
-    DrawSignature.clear();
-    $emits("cancel");
-  }
-
-  function execute() {
-    watchEffect(() => {
-      // 主动抛出不作为画布绘入
-      if (!$props.modelValue || DrawSignature.saveOutStatus) {
-        return;
-      }
-      $state.emptyCanvas = false;
-      // 画布绘入
-      DrawSignature.drawerImage($props.modelValue);
-    });
-  }
-
-  onMounted(() => {
-    execute();
-  });
-
-  onUnmounted(() => {
-    DrawSignature.killTemp();
-  });
+//onMounted(() => {
+//  execute();
+//});
 </script>
 
 <style lang="scss" scoped>
-  .signature {
-    box-sizing: border-box;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    width: v-bind("$props.width");
-    height: 100%;
+  @import "./scss/cascader.scss";
 
-    &__main {
-      position: relative;
-    }
-
-    &__canvas {
-      position: relative;
-      z-index: v-bind("$props.zIndex");
-      width: 100%;
-      height: v-bind("$props.height");
-      border: 1px dotted #E0E0E0;
-      border-radius: 10upx;
-      background-color: v-bind("$props.backgroundColor");
-      cursor: pointer;
-    }
-
-    &__canvas--disabled {
-      opacity: 0.85;
-    }
-
-    &__placeholder {
-      position: absolute;
-      top: 45%;
-      left: 50%;
-      transform: translate(-50%);
-      z-index: v-bind(placeholderZindex);
-      color: #333;
-    }
-
-    &__operation {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: flex-end;
-      margin: 20upx 20upx 0 20upx;
-    }
-
-    &__tip {
-      font-size: 24upx;
-      color: #9D9D9D;
-    }
-
-    &__btn-container {
-      margin-top: 10upx;
-
-      .signature__btn + .signature__btn {
-        margin-left: 10px;
-      }
-    }
+  :deep(.uni-popup) {
+    z-index: v-bind("$props.zindex");
   }
 </style>

@@ -57,34 +57,4 @@
   }
 </script>
 
-<style lang="scss" scoped>
-  .cascader-list {
-    box-sizing: border-box;
-    height: 30vh;
-    padding: 0 12upx 0 8upx;
-  }
-
-  .cascader-item {
-    display: flex;
-    align-items: center;
-    padding: 16upx 0;
-    cursor: pointer;
-
-    &:active {
-      background-color: #f0f0f0;
-    }
-
-    & + .cascader-item {
-      //border-top: 1px solid #E0E0E0;
-    }
-
-    &_checkbox {
-      margin-right: 6upx;
-    }
-
-    &_value {
-      font-size: 1.1em;
-      color: #272727;
-    }
-  }
-</style>
+<style lang="scss" scoped src="../../scss/cascader-list.scss"/>

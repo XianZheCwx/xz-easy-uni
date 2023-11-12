@@ -1,0 +1,24 @@
+.cascader {
+  padding: 20rpx;
+
+  &-hd {
+    margin: 0 10rpx 20rpx;
+
+    &_inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+  }
+
+  &__bd {
+    margin-bottom: 20rpx;
+  }
+
+  &__title {
+    font-size: 1.1em;
+    font-weight: bold;
+  }
+
+  &__ft {}
+}

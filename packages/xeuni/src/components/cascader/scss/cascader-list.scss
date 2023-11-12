@@ -1,0 +1,29 @@
+.cascader-list {
+  box-sizing: border-box;
+  height: 30vh;
+  padding: 0 12rpx 0 8rpx;
+}
+
+.cascader-item {
+  display: flex;
+  align-items: center;
+  padding: 16rpx 0;
+  cursor: pointer;
+
+  &:active {
+    background-color: #f0f0f0;
+  }
+
+  & + .cascader-item {
+    //border-top: 1px solid #E0E0E0;
+  }
+
+  &_checkbox {
+    margin-right: 6rpx;
+  }
+
+  &_value {
+    font-size: 1.1em;
+    color: #272727;
+  }
+}

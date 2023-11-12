@@ -1,0 +1,19 @@
+.cascader-breadcrumb {
+  display: flex;
+  margin-bottom: 20rpx;
+  cursor: pointer;
+
+  .breadcrumb {
+    padding-bottom: 6rpx;
+    cursor: pointer;
+
+    & + .breadcrumb {
+      margin-left: 20rpx;
+    }
+
+    &.hint {
+      font-size: 0.95em;
+      color: #4f4f4f;
+    }
+  }
+}

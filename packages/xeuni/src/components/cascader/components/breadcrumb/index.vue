@@ -81,27 +81,11 @@
 </script>
 
 <style lang="scss" scoped>
+  @import "../../scss/cascader-breadcrumb.scss";
+
   .cascader-breadcrumb {
-    display: flex;
-    margin-bottom: 20upx;
-    cursor: pointer;
-
-    .breadcrumb {
-      padding-bottom: 6upx;
-      cursor: pointer;
-
-      & + .breadcrumb {
-        margin-left: 20upx;
-      }
-
-      &.active {
-        border-bottom: 6upx solid v-bind("$props.color");
-      }
-
-      &.hint {
-        font-size: 0.95em;
-        color: #4f4f4f;
-      }
+    .breadcrumb.active {
+      border-bottom-color: v-bind("$props.color");
     }
   }
 </style>
