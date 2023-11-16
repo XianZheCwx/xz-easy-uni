@@ -11,7 +11,7 @@
     "list": [
       {
         "name": "xzEasyUni组件目录",
-        "path": "/demo-pages/home/index"
+        "path": "packages/demo/pages/home/index"
       },
       {
         "name": "文章资讯",
@@ -87,6 +87,12 @@
           "path": "signature/index",
           "style": {
             "navigationBarTitleText": "签名"
+          }
+        },
+        {
+          "path": "slider-range/index",
+          "style": {
+            "navigationBarTitleText": "区间滑块"
           }
         }
       ]
