@@ -1,3 +1,3 @@
-"use strict";
-export * from "./props";
+//"use strict";
+
 export * from "./router";

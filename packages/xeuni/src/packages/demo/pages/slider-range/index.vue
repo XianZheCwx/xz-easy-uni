@@ -1,13 +1,17 @@
 <template>
   <div class="slider-range">
     <demo-item :title="sliderRange_1.title">
-      <slider-range v-model="sliderRange_1.val" />
+      <xz-slider-range v-model="sliderRange_1.val" @change="f('111', $event)"/>
     </demo-item>
     <demo-item :title="sliderRange_2.title">
-      <slider-range v-model="sliderRange_2.val" solo :decoration="false" />
+      <xz-slider-range v-model="sliderRange_2.val" solo :decoration="false" @change="f('222', $event)" />
     </demo-item>
     <demo-item :title="sliderRange_3.title">
-      <slider-range v-model="sliderRange_3.val" />
+      <xz-slider-range v-model="sliderRange_3.val" :min="100" :max="1000000" @change="f('222', $event)" />
+    </demo-item>
+    <demo-item :title="sliderRange_4.title">
+      <xz-slider-range v-model="sliderRange_4.val" :format="(val) => `￥${val}万`"
+                    hint-color="#007979" hint-size="14px" @change="f('333', $event)"/>
     </demo-item>
   </div>
 </template>
@@ -21,8 +25,6 @@
    */
   import { computed, reactive, onMounted } from "vue";
 
-  import SliderRange from "@/components/xz-slider-range"
-
   const sliderRange_1 = reactive({
     title: "基本使用",
     val: [0, 100]
@@ -32,9 +34,17 @@
     val: []
   });
   const sliderRange_3 = reactive({
+    title: "自定义区间",
+    val: []
+  });
+  const sliderRange_4 = reactive({
     title: "自定义区间提示",
     val: []
   });
+
+  function f(name, val) {
+    console.log(name, val)
+  }
 
   onMounted(() => {
 

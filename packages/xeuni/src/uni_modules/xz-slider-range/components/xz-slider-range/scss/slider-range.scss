@@ -74,9 +74,9 @@
 
   &__hint {
     position: absolute;
-    top: -20px;
     left: 50%;
     font-size: 24upx;
     transform: translateX(-50%);
+    white-space: nowrap;
   }
 }
