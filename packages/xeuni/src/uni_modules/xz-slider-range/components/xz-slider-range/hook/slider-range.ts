@@ -122,7 +122,7 @@ export function useSliderRange(
   }
 
   function reset() {
-
+    $state.values = [$props.min, $props.max];
   }
 
   async function execute() {

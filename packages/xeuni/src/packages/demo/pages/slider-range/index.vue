@@ -1,17 +1,17 @@
 <template>
   <div class="slider-range">
     <demo-item :title="sliderRange_1.title">
-      <xz-slider-range v-model="sliderRange_1.val" @change="f('111', $event)"/>
+      <xz-slider-range v-model="sliderRange_1.val" />
     </demo-item>
     <demo-item :title="sliderRange_2.title">
-      <xz-slider-range v-model="sliderRange_2.val" solo :decoration="false" @change="f('222', $event)" />
+      <xz-slider-range v-model="sliderRange_2.val" solo :decoration="false" />
     </demo-item>
     <demo-item :title="sliderRange_3.title">
-      <xz-slider-range v-model="sliderRange_3.val" :min="100" :max="1000000" @change="f('222', $event)" />
+      <xz-slider-range v-model="sliderRange_3.val" :min="100" :max="1000000" />
     </demo-item>
     <demo-item :title="sliderRange_4.title">
       <xz-slider-range v-model="sliderRange_4.val" :format="(val) => `￥${val}万`"
-                    hint-color="#007979" hint-size="14px" @change="f('333', $event)"/>
+                       hint-color="#007979" hint-size="14px" />
     </demo-item>
   </div>
 </template>
@@ -41,10 +41,6 @@
     title: "自定义区间提示",
     val: []
   });
-
-  function f(name, val) {
-    console.log(name, val)
-  }
 
   onMounted(() => {
 

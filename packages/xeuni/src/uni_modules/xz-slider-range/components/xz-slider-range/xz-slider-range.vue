@@ -56,7 +56,7 @@
       height: v-bind("$props.height");
 
       &-active {
-        background-color: v-bind("$props.activeColor");
+        background-color: v-bind("$props.activeBgc");
       }
     }
 

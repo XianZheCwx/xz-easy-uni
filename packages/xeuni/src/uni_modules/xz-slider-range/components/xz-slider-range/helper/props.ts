@@ -46,7 +46,7 @@ export const silderRangeProps = {
   // 背景条颜色
   bgc: makeStringProp("#E9E9E9"),
   // 已选择的颜色
-  activeColor: makeStringProp("#1AAD19"),
+  activeBgc: makeStringProp("#1AAD19"),
   // 区间进度条高度
   height: makeStringProp("5px"),
   // 是否显示滑块值提示文本
