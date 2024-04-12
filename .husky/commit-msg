@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+source .husky/_base
+
+# 检查提交信息规范
+function checkCommitMsg() {
+    echo -e "\033[1;32m正在执行提交信息格式检查, 当前提交信息为：$(cat "$1")\033[0m"
+    echo -e "\033[1;32m提交规范文档请参考：https://www.conventionalcommits.org/en/v1.0.0/\033[0m"
+    if $HAS_PNPM; then
+        pnpm exec commitlint --edit "$1"
+    else
+        npx --no-install commitlint --edit "$1"
+    fi
+}
+
+function main() {
+    checkCommitMsg "$@"
+}
+
+execute main "$@"

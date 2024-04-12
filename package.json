@@ -1,23 +1,51 @@
 {
-  "name": "xzeasyuni",
-  "version": "1.0.0",
+  "name": "xz-easy-uni",
+  "version": "0.0.0",
   "description": "",
-  "main": "index.js",
+  "private": true,
   "workspaces": [
+    "apps/*",
     "packages/*"
   ],
-  "directories": {
-    "doc": "docs"
-  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "turbo run start:mp-weixin --continue",
-    "start:app": "turbo run start:app --continue"
+    "start": "turbo run dev:h5 --continue --filter=@xz-easy-uni/easy-uni-ui",
+    "build": "turbo run build:mp-weixin --continue --filter=@xz-easy-uni/easy-uni-ui",
+    "start:wechat": "turbo run dev:mp-weixin --continue --filter=@xz-easy-uni/easy-uni-ui",
+    "build:wechat": "turbo run dev:mp-weixin --continue --filter=@xz-easy-uni/easy-uni-ui",
+    "start:app": "turbo run dev:app --continue --filter=@xz-easy-uni/easy-uni-ui",
+    "build:app": "turbo run dev:app --continue --filter=@xz-easy-uni/easy-uni-ui",
+    "start:ui": "turbo run dev:h5 --continue --filter=@xz-easy-uni/easy-uni-ui",
+    "build:ui": "turbo run build:h5 --continue --filter=@xz-easy-uni/easy-uni-ui",
+    "start:ui:wechat": "turbo run dev:mp-weixin --continue --filter=@xz-easy-uni/easy-uni-ui",
+    "build:ui:wechat": "turbo run build:mp-weixin --continue --filter=@xz-easy-uni/easy-uni-ui",
+    "start:ui:app": "turbo run dev:app --continue --filter=@xz-easy-uni/easy-uni-ui",
+    "build:ui:app": "turbo run build:app --continue --filter=@xz-easy-uni/easy-uni-ui",
+    "prepare": "husky"
   },
   "keywords": [],
   "author": "",
-  "license": "GPL3.0",
+  "license": "MIT",
+  "packageManager": "pnpm@8.11.0",
+  "dependencies": {
+    "@xz-easy-uni/easy-uni-ui": "workspace:*",
+    "@xz-easy-uni/easy-uni-cli": "workspace:*"
+  },
   "devDependencies": {
-    "turbo": "^1.10.13"
+    "@commitlint/cli": "^17.8.1",
+    "@commitlint/config-conventional": "^17.8.1",
+    "@eslint/js": "^8.57.0",
+    "@vue/eslint-config-typescript": "^13.0.0",
+    "eslint": "^8.57.0",
+    "eslint-plugin-vue": "^9.24.0",
+    "globals": "^15.0.0",
+    "husky": "^9.0.11",
+    "lint-staged": "^13.3.0",
+    "prettier": "^3.2.5",
+    "turbo": "^1.13.0",
+    "typescript-eslint": "^7.4.0"
+  },
+  "engines": {
+    "node": ">=16 <=18",
+    "pnpm": ">=7"
   }
 }

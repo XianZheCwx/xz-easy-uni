@@ -1,5 +1,5 @@
 {
-  "name": "xeuni-cli",
+  "name": "@xz-easy-uni/easy-uni-cli",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",

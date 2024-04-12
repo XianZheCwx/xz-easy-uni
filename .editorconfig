@@ -19,7 +19,7 @@ indent_size = 2
 
 [*.{cjs,mjs,js,jsx,ts,tsx}]
 indent_size = 2
-max_line_length = 80
+max_line_length = 100
 tab_width = 2
 
 # 在Markdown文档中，换行符前删除空格以确保语法准确
@@ -27,6 +27,5 @@ tab_width = 2
 max_line_length = off
 trim_trailing_whitespace = false
 
-[{*.har,*.jsb2,*.jsb3,*.json,.babelrc,.eslintrc,.prettierrc,.stylelintrc,bowerrc,jest.config}]
+[{*.har,*.jsb2,*.jsb3,*.json,.babelrc,.eslintrc,.prettierrc,.stylelintrc,.commitlintrc,bowerrc,jest.config}]
 indent_size = 2
-

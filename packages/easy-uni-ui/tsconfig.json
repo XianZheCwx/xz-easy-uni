@@ -1,0 +1,38 @@
+{
+  "extends": "@vue/tsconfig/tsconfig.json",
+  "compilerOptions": {
+    "sourceMap": true,
+    "baseUrl": "./",
+    "target": "ES2020",
+    "module": "ES2020",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    // 启用装饰器语法
+    "experimentalDecorators": true,
+    // 为装饰器提供元数据的支持
+    "emitDecoratorMetadata": true,
+    "paths": {
+      "@": ["./src/*"],
+      "@/*": ["./src/*"],
+      "@main": ["./src/packages/main"],
+      "@main/*": ["./src/packages/main"],
+      "@sundry": ["./src/packages/sundry"],
+      "@sundry/*": ["./src/packages/sundry"]
+    },
+    "types": [
+      "@dcloudio/types",
+      "@types/node",
+      "@types/weixin-app"
+    ],
+    "lib": [
+      "esnext",
+      "dom"
+    ]
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.d.ts",
+    "src/**/*.tsx",
+    "src/**/*.vue"
+  ]
+}

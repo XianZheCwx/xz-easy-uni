@@ -1,18 +1,26 @@
 {
   "compilerOptions": {
     "sourceMap": true,
+    "baseUrl": "./",
+    "target": "ESNext",
+    "module": "ESNext",
+    "strict": true,
+    "jsx": "preserve",
+    "moduleResolution": "node",
     "esModuleInterop": true,
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["./src/*"]
-    },
-    "lib": ["esNext", "dom"],
-    "types": ["@dcloudio/types", "unplugin-vue-define-options/macros-global"]
+    "resolveJsonModule": true,
+    "useDefineForClassFields": true,
+    // 启用装饰器语法
+    "experimentalDecorators": true,
+    // 为装饰器提供元数据的支持
+    "emitDecoratorMetadata": true,
+    "lib": ["ESNext", "dom"]
   },
   "include": [
-    "src/**/*.ts",
-    "src/**/*.d.ts",
-    "src/**/*.tsx",
-    "src/**/*.vue"
+    "packages/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/dist"
   ]
 }

@@ -1,0 +1,132 @@
+// 这里是uni-app内置的常用样式变
+// uni-app 官方扩展插件及插件市场（https://ext.dcloud.net.cn）上很多三方插件均使用了这些样式变量
+// 如果你是插件开发者，建议你使用scss预处理，并在插件代码中直接使用这些变量（无需 import 这个文件），方便用户通过搭积木的方式开发整体风格一致的Ap//
+
+//如果你是App开发者（插件使用者），你可以通过修改这些变量来定制自己的插件主题，实现自定义主题功能
+//如果你的项目同样使用了scss预处理，你也可以直接在你的 scss 代码中使用如下变量，同时无需 import 这个文件
+
+// 颜色变量 👇
+
+/* 主题颜色 */
+$primary-color: #2894FF;
+$dark-primary-color: #0072E3;
+$shallow-primary-color: #84C1FF;
+
+/* 页面背景颜色 */
+$page-bg-color: #F7F8FA;
+
+/* 行为相关颜色 */
+$uni-color-primary: $primary-color;
+
+/* 行为相关颜色 */
+$uni-color-primary: #007AFF;
+$uni-color-success: #4CD964;
+$uni-color-warning: #F0AD4E;
+$uni-color-error: #DD524D;
+
+/* 文字基本颜色 */
+$uni-text-color: #333; // 基本色
+$uni-text-color-inverse: #FFF; // 反色
+$uni-text-color-grey: #999; // 辅助灰色，如加载更多的提示信息
+$uni-text-color-placeholder: #808080;
+$uni-text-color-disable: #C0C0C0;
+
+/* 背景颜色 */
+$uni-bg-color: #FFF;
+$uni-bg-color-grey: #F8F8F8;
+$uni-bg-color-hover: #F1F1F1; // 点击状态颜色
+$uni-bg-color-mask: rgba(0, 0, 0, 0.4); // 遮罩颜色
+
+/* 边框颜色 */
+$uni-border-color: #C8C7CC;
+
+// 尺寸变量
+
+/* 文字尺寸 */
+$uni-font-size-sm: 12px;
+$uni-font-size-base: 14px;
+$uni-font-size-lg: 16;
+
+/* 图片尺寸 */
+$uni-img-size-sm: 20px;
+$uni-img-size-base: 26px;
+$uni-img-size-lg: 40px;
+
+/* Border Radius */
+$uni-border-radius-sm: 2px;
+$uni-border-radius-base: 3px;
+$uni-border-radius-lg: 6px;
+$uni-border-radius-circle: 50%;
+
+/* 水平间距 */
+$uni-spacing-row-sm: 5px;
+$uni-spacing-row-base: 10px;
+$uni-spacing-row-lg: 15px;
+
+/* 垂直间距 */
+$uni-spacing-col-sm: 4px;
+$uni-spacing-col-base: 8px;
+$uni-spacing-col-lg: 12px;
+
+/* 透明度 */
+$uni-opacity-disabled: 0.3; // 组件禁用态的透明度
+
+/* 文章场景相关 */
+$uni-color-title: #2C405A; // 文章标题颜色
+$uni-font-size-title: 20px;
+$uni-color-subtitle: #555; // 二级标题颜色
+$uni-font-size-subtitle: 18px;
+$uni-color-paragraph: #3F536E; // 文章段落颜色
+$uni-font-size-paragraph: 15px;
+
+
+/* 遮罩 */
+$mask-zindex: 1999;
+
+/* 卡片 */
+$cell-radius: 12px;
+$cell-bgc: #FFF;
+
+// 页面安全容器
+@mixin container($bgc: #FCFCFC, $around: 30upx, $bottom: 40upx, $padding: true, $safeBottom: true, $minHeight: 92vh) {
+  box-sizing: border-box;
+
+  @if $bgc {
+    background-color: $bgc;
+  }
+
+  @if padding {
+    padding: $around $around $bottom;
+  }
+
+  @if $safeBottom {
+    padding-bottom: calc(#{$bottom} + env(safe-area-inset-bottom, 0));
+  }
+
+  @if $minHeight {
+    min-height: calc($minHeight - var(--window-top));
+  }
+}
+
+// 文本溢出隐藏Mixin
+// $line: 指定第几行隐藏
+// $overflow: 溢出内容隐藏方式，默认ellipsis
+@mixin textHidden($line: 1, $overflow: ellipsis) {
+  overflow: hidden;
+  text-overflow: $overflow;
+  word-break: break-all;
+  display: -webkit-box;
+  -webkit-line-clamp: $line;
+  -webkit-box-orient: vertical;
+}
+
+// 隐藏滚动条
+@mixin hideScrollBar() {
+  @-moz-document url-prefix() {
+    scrollbar-width: thin;
+  }
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
