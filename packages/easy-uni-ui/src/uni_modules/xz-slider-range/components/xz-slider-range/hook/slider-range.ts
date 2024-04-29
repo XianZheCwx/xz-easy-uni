@@ -93,6 +93,7 @@ export function useSliderRange(
         * (($props.max - $props.min) / 100)
         * (1 + $props.rate * 0.1) + $props.min;
 
+      // left为起始位置，大于其实位置的滑动操作才为正常
       switch (true) {
         // 高值不低于底值限制
         case index !== 0 && target <= $state.values[0]:
@@ -104,8 +105,13 @@ export function useSliderRange(
         case pageX >= left + width:
           $state.values[index] = $props.max;
           break;
+        // 普通滑动
         case pageX >= left:
           $state.values[index] = target;
+          break;
+        // 过小处理
+        default:
+          $state.values[index] = $props.min;
       }
 
       const extract = $state.values.slice(0, $props.solo ? 1 : $state.values.length);
