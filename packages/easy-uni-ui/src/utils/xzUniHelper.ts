@@ -11,6 +11,7 @@ import type {
   NodeInfo,
   ConfirmHintOpts,
   JointUrl,
+  ParseUrl,
   RouterPush,
   RouterDerive
 } from "./xzUniHelper.d";
@@ -88,6 +89,29 @@ export function jointUrl(
     return fquery.join("&");
   }
   return url + joint + fquery.join("&");
+}
+
+/**
+ * URL解析
+ * @param rawurl 原始url地址
+ */
+export function parseUrl(rawurl: string): ParseUrl {
+  const res: ParseUrl = { url: rawurl, query: {} };
+  const urlRule = new RegExp("^(?<url>.+?)\\?(?<query>.+)");
+  const queryRule = new RegExp("(?<key>\\w+)=(?<value>\\S+)");
+
+  if (urlRule.test(rawurl)) {
+    const { url, query } = urlRule.exec(rawurl)?.groups ?? {};
+    for (const q of query.split("&")) {
+      if (!queryRule.test(q)) {
+        continue;
+      }
+      const { key, value } = queryRule.exec(q)?.groups as { [key: string]: string } ?? {};
+      res.query[key] = value;
+      res.url = url;
+    }
+  }
+  return res;
 }
 
 // 格式化日期辅助函数

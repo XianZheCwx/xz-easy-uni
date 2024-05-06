@@ -22,6 +22,11 @@ export interface JointUrl {
   onlyquery?: boolean;
 }
 
+export interface ParseUrl {
+  url: string,
+  query: { [key: string]: string }
+}
+
 export interface RouterPush {
   query?: Record<string, unknown>;
   replace?: boolean;
