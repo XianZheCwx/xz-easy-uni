@@ -47,7 +47,7 @@
 </script>
 
 <style lang="scss" scoped>
-  @import "./scss/slider-range";
+  @import "./scss/slider-range.scss";
 
   .slider-range {
     padding: 0 v-bind("sliderRangeStyle.barPadding");

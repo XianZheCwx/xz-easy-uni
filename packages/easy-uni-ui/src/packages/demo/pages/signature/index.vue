@@ -39,6 +39,7 @@
     onUnmounted,
     type ComponentPublicInstance
   } from "vue";
+  import DemoItem from "@/components/demo/demo-item.vue";
   //  import Signature from "@/components/signature";
 
   const $ref: Record<string, ComponentPublicInstance<any>> = reactive({
@@ -74,12 +75,11 @@
       signature_4.subtitle = `将在${count}秒后自动保存`;
       if (count === 0) {
         count = 10;
-        console.log("在调用吗？");
         $ref.signature_4?.saveEvent();
         return;
       }
       count--;
-    }, 1000);
+    }, 1000) as unknown as number;
   }
 
   onMounted(() => {

@@ -1,7 +1,6 @@
 <template>
-  <view
-    :class="{ 'signature--landscape': landscapeOpts.show }"
-    class="signature">
+  <view :class="{ 'signature--landscape': landscapeOpts.show }"
+        class="signature">
     <view class="signature__main">
       <canvas
         :id="$state.uidCanvas"
