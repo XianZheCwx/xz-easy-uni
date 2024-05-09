@@ -102,6 +102,18 @@
           }
         }
       ]
+    },
+    {
+      "root": "packages/sundry",
+      "name": "sundryPack",
+      "pages": [
+        {
+          "path": "pages/index/index",
+          "style": {
+            "navigationBarTitleText": "sundryPack"
+          }
+        }
+      ]
     }
   ]
 }
