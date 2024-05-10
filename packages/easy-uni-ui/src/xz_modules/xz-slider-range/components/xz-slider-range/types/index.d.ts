@@ -1,3 +1,6 @@
+
+export type HintMode = "top" | "bottom" | "insert" | "toast";
+
 export interface SliderBlockCtx {
   blocks: {
     hint: string | number;

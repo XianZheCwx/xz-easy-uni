@@ -41,7 +41,7 @@
   .demo-item {
     display: flex;
     flex-direction: column;
-    margin-bottom: 80rpx;
+    margin-bottom: 50rpx;
 
     &__hd {
       display: flex;

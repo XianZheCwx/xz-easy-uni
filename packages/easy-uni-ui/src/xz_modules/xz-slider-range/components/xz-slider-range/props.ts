@@ -1,4 +1,5 @@
 import type { PropType, ExtractPropTypes } from "vue";
+import type { HintMode } from "./types";
 
 
 export const truthProp = {
@@ -55,10 +56,10 @@ export const silderRangeProps = {
   hintSize: makeStringProp("12px"),
   // 提示文本颜色
   hintColor: makeStringProp("#666"),
-  // 提示重叠安全距离（百分比）
+  // 提示文本重叠安全距离（百分比）
   hintSafeOverlap: makeNumberProp(5),
-  // 提示距按钮距离
-  hintDistance: makeStringProp("-24px"),
+  // 提示文本显示方式
+  hintMode: makeStringProp<HintMode>("bottom"),
   // 是否显示滑块内装饰元素
   decoration: truthProp,
   // 是否为单区间模式
@@ -66,7 +67,7 @@ export const silderRangeProps = {
 };
 
 export const silderRangeEmits = [
-  "update:modelValue", "change"
+  "update:modelValue", "change", "move"
 ];
 
 export type SilderRangeProps = ExtractPropTypes<typeof silderRangeProps>

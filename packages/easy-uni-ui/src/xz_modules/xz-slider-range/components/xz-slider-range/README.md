@@ -10,14 +10,14 @@ xz-slider-range 是基于 uniapp 框架的一款区间滑块组件，组件干�
 
 支持 easycom 导入，允许不导入组件直接使用。目前基于TS编写，暂未分离TS语法，需要项目支持TS依赖使用。
 
-**特点：**
+<font size=5>**特点：**</font>
 
-- 简单易用，仅需一个 `v-model` 属性即可实现主要功能。
+- **简单易用，仅需一个 `v-model` 属性即可实现主要功能。**
 - 支持单、双范围灵活切换。
-- 自定义程度高，可根据具体需求，自定义 UI、内容。
-- 单组件下载版本无需第三方依赖，开箱直用，若需要使用多个该系列组件，建议使用体积更小的完整组件包。
+- **自定义程度高，可根据具体需求，自定义 UI、内容。**
+- **单组件下载版本无需第三方依赖，开箱直用，若需要使用多个该系列组件，建议使用体积更小的完整组件包。**
 
->  注意：组件属于首发测试阶段，使用过程中遇到问题或有建议的话请提交 [Issues · xzcwx/xz-easy-uni (github.com)](https://github.com/xzcwx/xz-easy-uni/issues)，感谢您的配合❤。
+>  注意：<font color=bold>**组件目前属于首发测试阶段**</font>，使用过程中遇到问题或有建议的话请提交 [Issues · xzcwx/xz-easy-uni (github.com)](https://github.com/xzcwx/xz-easy-uni/issues)，感谢您的配合❤。
 
 
 
@@ -124,8 +124,8 @@ xz-slider-range 是基于 uniapp 框架的一款区间滑块组件，组件干�
 | 属性名 | 类型 | 默认值 | 说明 |
 | :-: | :-: | :-: | :-: |
 | **modelValue** | Array<number, number> | `[min, max]` | 滑块已选中区间的值 |
-| min | number | `0` | 滑块区间最小值 |
-| max | number | `100` | 滑块区间最大值 |
+| **min** | number | `0` | 滑块区间最小值 |
+| **max** | number | `100` | 滑块区间最大值 |
 | rate | number | `0` |               步进倍率（依据实际min和max为主）               |
 | format | (val: number) => string | `undefined` |                       滑块值格式化回调                       |
 | disabled | boolean | `false` | 是否为禁用状态 |
@@ -138,7 +138,7 @@ xz-slider-range 是基于 uniapp 框架的一款区间滑块组件，组件干�
 | hintSize | string | `12px` | 提示文本大小 |
 | hintColor | string | `#666` | 提示文本颜色 |
 | hintSafeOverlap | number | `5` | 提示重叠安全距离（百分比） |
-| hintDistance | string | `-24px` | 提示距按钮距离 |
+| **hintMode** | "top" \| "bottom" \| "insert" \| "toast" | `bottom` | 提示文本显示方式 |
 | decoration | boolean | `true` | 是否显示滑块内装饰元素 |
 | **solo** | boolean | `false` | 是否为单区间模式 |
 
@@ -149,6 +149,7 @@ xz-slider-range 是基于 uniapp 框架的一款区间滑块组件，组件干�
 
 | 事件名 |           参数            |       说明       |
 | :----: | :-----------------------: | :--------------: |
+|  move  | `(val: number[]) => void` |  滑块滑动时触发  |
 | change | `(val: number[]) => void` | 滑块值更改时触发 |
 
 

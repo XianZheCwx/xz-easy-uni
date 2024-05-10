@@ -1,21 +1,30 @@
 <template>
-  <view :class="{ 'slider-range--disabled': $props.disabled }"
-        class="slider-range">
-    <view class="slider-range__inner">
+  <view :class="{ 'xz-slider-range--disabled': $props.disabled }"
+        class="xz-slider-range">
+    <view class="xz-slider-range__inner">
       <!-- 滑动条 -->
-      <view class="slider-range__bar">
-        <view :style="{ backgroundColor: $props.bgc }" class="slider-range__bar-bg" />
-        <view :style="sliderRangeStyle.activeBarStyle" class="slider-range__bar-active" />
+      <view class="xz-slider-range__bar">
+        <view class="xz-slider-range__bar-bg" />
+        <view :style="sliderRangeStyle.activeBarStyle" class="xz-slider-range__bar-active" />
       </view>
       <view v-for="(item, index) in sliderBlockCtx.blocks" :key="index"
-            class="slider-range__controls"
-            :style="item.style">
+            :style="item.style"
+            class="xz-slider-range__controls"
+            @touchmove="blockEvent($event, index)">
         <!-- 滑块值提示 -->
-        <view v-if="item.showHint" class="slider-range__hint">{{ item.hint }}</view>
+        <view v-if="item.showHint"
+              :class="{
+                'xz-slider-range__hint--top': /^top$/.test($props.hintMode),
+                'xz-slider-range__hint--bottom': /^bottom$/.test($props.hintMode),
+                'xz-slider-range__hint--insert': /^insert$/.test($props.hintMode),
+                'xz-slider-range__hint--toast': /^toast$/.test($props.hintMode)
+              }"
+              class="xz-slider-range__hint">
+          <text>{{ item.hint }}</text>
+        </view>
         <!-- 滑块 -->
-        <view :class="{'slider-range__block--decoration': sliderBlockCtx.decoration}"
-              class="slider-range__block"
-              @touchmove="blockEvent($event, index)" />
+        <view :class="{'xz-slider-range__block--decoration': sliderBlockCtx.decoration}"
+              class="xz-slider-range__block" />
       </view>
     </view>
   </view>
@@ -23,13 +32,13 @@
 
 <script lang="ts" setup>
   /*
-   * 组件名: slider-range
+   * 组件名: xz-slider-range
    * 组件用途: 范围滑块组件
    * 创建日期: 2023/5/18
    * 编写者: XianZhe
    */
-  import { silderRangeProps, silderRangeEmits } from "./helper/props";
-  import { useSliderRange } from "./hook/slider-range";
+  import { silderRangeProps, silderRangeEmits } from "./props";
+  import { useSliderRange } from "./hook";
 
   const $props = defineProps(silderRangeProps);
   const $emits = defineEmits(silderRangeEmits);
@@ -46,14 +55,17 @@
 
 </script>
 
+<style lang="scss" scoped src="./scss/index.scss" />
 <style lang="scss" scoped>
-  @import "./scss/slider-range.scss";
-
-  .slider-range {
+  .xz-slider-range {
     padding: 0 v-bind("sliderRangeStyle.barPadding");
 
     &__bar {
       height: v-bind("$props.height");
+
+      &-bg {
+        background-color: v-bind("$props.bgc");
+      }
 
       &-active {
         background-color: v-bind("$props.activeBgc");
@@ -67,7 +79,6 @@
     }
 
     &__hint {
-      top: v-bind("$props.hintDistance");
       font-size: v-bind("$props.hintSize");
       color: v-bind("$props.hintColor");
     }

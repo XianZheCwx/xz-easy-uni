@@ -2,27 +2,15 @@ import {
   computed, reactive, onMounted,
   toRaw, getCurrentInstance
 } from "vue";
-import type { SilderRangeProps } from "../helper/props";
 import type { SliderBlockCtx } from "../types";
+import type { SilderRangeProps } from "../props";
 
 export interface NodeInfo extends UniNamespace.NodeInfo {
   width: number;
   height: number;
 }
 
-// 获取DOM元素矩形宽高
-export function getRect(target: string, range?: unknown) {
-  return new Promise<NodeInfo>((resolve) => {
-    uni
-      .createSelectorQuery()
-      .in(range)
-      .select(target)
-      .boundingClientRect((size) => {
-        resolve(size as NodeInfo);
-      })
-      .exec();
-  });
-}
+let _blockDebounceTimer: number | null = null;
 
 export function useSliderRange(
   $props: SilderRangeProps,
@@ -35,6 +23,28 @@ export function useSliderRange(
     rect: {} as NodeInfo
   });
 
+  const sliderRangeStyle = computed(() => {
+    const [lower, higher] = $state.values;
+    const barPadding = $props.size / 2 + "px";
+    let activeBarStyle = {
+      width: getPercent(higher, lower) + "%",
+      left: getPercent(lower, $props.min) + "%"
+    };
+
+    if ($props.solo) {
+      activeBarStyle = {
+        width: lower + "%",
+        left: "0%"
+      };
+    }
+
+    return {
+      barPadding, activeBarStyle,
+      blockSize: $props.size + "px"
+    };
+  });
+
+  // 滑块按钮上下文控制
   const sliderBlockCtx = computed<SliderBlockCtx>(() => {
     const [lower, higher] = $state.values;
     const lp = getPercent(lower, $props.min);
@@ -59,33 +69,14 @@ export function useSliderRange(
         style: { left: rp + "%" }
       });
     }
-
-    return { blocks, decoration: $props.decoration };
-  });
-
-  const sliderRangeStyle = computed(() => {
-    const [lower, higher] = $state.values;
-    const barPadding = $props.size / 2 + "px";
-    let activeBarStyle = {
-      width: getPercent(higher, lower) + "%",
-      left: getPercent(lower, $props.min) + "%"
-    };
-
-    if ($props.solo) {
-      activeBarStyle = {
-        width: lower + "%",
-        left: "0%"
-      };
-    }
-
     return {
-      barPadding, activeBarStyle,
-      blockSize: $props.size + "px"
+      blocks,
+      decoration: $props.decoration && !["insert"].includes($props.hintMode)
     };
   });
 
   function blockEvent(e: TouchEvent, index: number) {
-    const { pageX } = e?.touches?.[e?.touches.length - 1];
+    const { pageX } = e?.touches?.[e?.touches.length - 1] ?? {};
     const { left, width } = $state.rect;
 
     if (left && width) {
@@ -114,9 +105,21 @@ export function useSliderRange(
           $state.values[index] = $props.min;
       }
 
+      // 赋值完毕才取值
       const extract = $state.values.slice(0, $props.solo ? 1 : $state.values.length);
+      // 防抖过程
+      _blockDebounceTimer && clearTimeout(_blockDebounceTimer);
+      _blockDebounceTimer = setTimeout(() => {
+        if ($props.hintMode && ["toast"].includes($props.hintMode)) {
+          uni.showToast({
+            title: `当前值: ${extract}`,
+            icon: "none"
+          });
+        }
+        $emits("change", toRaw(extract));
+      }, 200) as unknown as number;
       $emits("update:modelValue", extract);
-      $emits("change", toRaw(extract));
+      $emits("move", toRaw(extract));
     }
   }
 
@@ -132,9 +135,9 @@ export function useSliderRange(
   }
 
   async function execute() {
-    $state.rect = await getRect(".slider-range__inner", $refs.self);
+    $state.rect = await getRect(".xz-slider-range__inner", $refs.self);
 
-    if ($props.modelValue && Array.isArray($props.modelValue) && $props.modelValue.length >= 2) {
+    if ($props.modelValue && Array.isArray($props.modelValue) && $props.modelValue.length >= 1) {
       $state.values = $props.modelValue;
     }
     $emits("update:modelValue", $state.values);
@@ -146,4 +149,18 @@ export function useSliderRange(
     $state, sliderRangeStyle,
     sliderBlockCtx, blockEvent, reset
   };
+}
+
+// 获取DOM元素矩形宽高
+export function getRect(target: string, range?: unknown) {
+  return new Promise<NodeInfo>((resolve) => {
+    uni
+      .createSelectorQuery()
+      .in(range)
+      .select(target)
+      .boundingClientRect((size) => {
+        resolve(size as NodeInfo);
+      })
+      .exec();
+  });
 }

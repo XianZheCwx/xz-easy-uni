@@ -4,14 +4,26 @@
       <xz-slider-range v-model="sliderRange_1.val" />
     </demo-item>
     <demo-item :title="sliderRange_2.title">
-      <xz-slider-range v-model="sliderRange_2.val" solo :decoration="false" />
+      <xz-slider-range v-model="sliderRange_2.val" solo :decoration="false"
+                       color="#FF359A" />
     </demo-item>
     <demo-item :title="sliderRange_3.title">
-      <xz-slider-range v-model="sliderRange_3.val" :min="100" :max="1000000" />
+      <xz-slider-range v-model="sliderRange_3.val" :min="100" :max="1000000"
+                       active-bgc="#2894FF" bgc="#A6FFFF"  />
     </demo-item>
     <demo-item :title="sliderRange_4.title">
-      <xz-slider-range v-model="sliderRange_4.val" :format="(val) => `￥${val}万`"
+      <xz-slider-range v-model="sliderRange_4.val[0]"
+                       :format="(val) => `￥${val}万`"
                        hint-color="#007979" hint-size="14px" />
+      <xz-slider-range v-model="sliderRange_4.val[1]"
+                       hint-mode="toast" active-bgc="#2894FF"
+                       hint-color="#007979" hint-size="14px" />
+      <xz-slider-range v-model="sliderRange_4.val[2]"
+                       hint-mode="top" active-bgc="#2894FF"
+                       hint-color="#007979" hint-size="14px" />
+      <xz-slider-range v-model="sliderRange_4.val[3]"
+                       hint-mode="insert" active-bgc="#2894FF"
+                       hint-color="#000" hint-size="14px" />
     </demo-item>
   </div>
 </template>
@@ -31,15 +43,15 @@
   });
   const sliderRange_2 = reactive({
     title: "传统单区间滑块",
-    val: []
+    val: [22]
   });
   const sliderRange_3 = reactive({
     title: "自定义区间",
-    val: []
+    val: [100, 600000]
   });
   const sliderRange_4 = reactive({
     title: "自定义区间提示",
-    val: []
+    val: [[], [], [], [], []]
   });
 
   onMounted(() => {
