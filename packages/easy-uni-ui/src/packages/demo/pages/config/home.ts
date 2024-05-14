@@ -6,10 +6,11 @@ export const baseOpts = {
   ]
 }
 
-export const formOpts = {
+export const formComponentOpts = {
   title: "表单组件",
   list: [
     { label: "签名", icon: "", to: "/packages/demo/pages/signature/index" },
     { label: "区间滑块", icon: "", to: "/packages/demo/pages/slider-range/index" },
+    { label: "文字提示气泡", icon: "", to: "/packages/demo/pages/tooltip/index" }
   ]
 };

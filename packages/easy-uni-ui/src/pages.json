@@ -2,13 +2,13 @@
   "easycom": {
     "autoscan": true,
     "custom": {
-      "^uni-(.*)": "@dcloudio/uni-ui/lib/uni-$1/uni-$1.vue",
+      "^uv-(.*)": "@climblee/uv-ui/components/uv-$1/uv-$1.vue",
       "^xz-(.*)": "@/xz_modules/xz-$1/components/xz-$1/xz-$1.vue"
     }
   },
   "globalStyle": {
     "navigationBarTextStyle": "black",
-    "navigationBarTitleText": "uni-app",
+    "navigationBarTitleText": "贤哲的百宝箱",
     "navigationBarBackgroundColor": "#F8F8F8",
     "backgroundColor": "#F8F8F8"
   },
@@ -99,6 +99,12 @@
           "path": "slider-range/index",
           "style": {
             "navigationBarTitleText": "区间滑块"
+          }
+        },
+        {
+          "path": "tooltip/index",
+          "style": {
+            "navigationBarTitleText": "文字提示气泡"
           }
         }
       ]

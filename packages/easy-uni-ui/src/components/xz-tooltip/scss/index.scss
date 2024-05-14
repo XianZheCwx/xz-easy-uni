@@ -1,0 +1,187 @@
+// 三角箭头大小
+$triangleSize: 20;
+// 三角箭头偏移量
+$offsetTriangle: -#{$triangleSize * 2 - 6 }rpx;
+// 方位对齐方式
+$azimuthAlign: ["start", "end"];
+
+
+// 气泡+三角箭头总偏移量
+@function offsetTotal($minus: false) {
+  @if ($minus) {
+    @return calc(-100% - #{$triangleSize}rpx);
+  }
+  @return calc(100% + #{$triangleSize}rpx);
+}
+
+// 上方方向
+@mixin topAzimuth($align: null) {
+  .xz-tooltip__tips {
+    @if ($align == "start") {
+      left: 0;
+      transform: translate(0, #{offsetTotal(true)});
+    } @else if ($align == "end") {
+      right: 0;
+      transform: translate(0, #{offsetTotal(true)});
+    } @else {
+      left: 50%;
+      transform: translate(-50%, #{offsetTotal(true)});
+    }
+
+    top: 0;
+
+    &::before {
+      left: var(--xz-tooltip--triangle-pos);
+      bottom: $offsetTriangle;
+      border-top-color: var(--xz-tooltip--bgc);
+      transform: translateX(-50%);
+    }
+  }
+}
+
+// 下方方向
+@mixin bottomAzimuth($align: null) {
+  .xz-tooltip__tips {
+    @if ($align == "start") {
+      left: 0;
+      transform: translate(0, #{offsetTotal()});
+    } @else if ($align == "end") {
+      right: 0;
+      transform: translate(0, #{offsetTotal()});
+    } @else {
+      left: 50%;
+      transform: translate(-50%, #{offsetTotal()});
+    }
+
+    bottom: 0;
+
+    &::before {
+      left: var(--xz-tooltip--triangle-pos);
+      top: $offsetTriangle;
+      border-bottom-color: var(--xz-tooltip--bgc);
+      transform: translateX(-50%);
+    }
+  }
+}
+
+// 左侧方向
+@mixin leftAzimuth($align: null) {
+  .xz-tooltip__tips {
+    @if ($align == "start") {
+      top: 0;
+      transform: translate(#{offsetTotal(true)}, 0);
+    } @else if ($align == "end") {
+      bottom: 0;
+      transform: translate(#{offsetTotal(true)}, 0);
+    } @else {
+      top: 50%;
+      transform: translate(#{offsetTotal(true)}, -50%);
+    }
+
+    left: 0;
+
+    &::before {
+      top: var(--xz-tooltip--triangle-pos);
+      right: $offsetTriangle;
+      border-left-color: var(--xz-tooltip--bgc);
+      transform: translateY(-50%);
+    }
+  }
+}
+
+// 右侧方向
+@mixin rightAzimuth($align: null) {
+  .xz-tooltip__tips {
+    @if ($align == "start") {
+      top: 0;
+      transform: translate(#{offsetTotal()}, 0);
+    } @else if ($align == "end") {
+      bottom: 0;
+      transform: translate(#{offsetTotal()}, 0);
+    } @else {
+      top: 50%;
+      transform: translate(#{offsetTotal()}, -50%);
+    }
+
+    right: 0;
+
+    &::before {
+      top: var(--xz-tooltip--triangle-pos);
+      left: $offsetTriangle;
+      border-right-color: var(--xz-tooltip--bgc);
+      transform: translateY(-50%);
+    }
+  }
+}
+
+.xz-tooltip {
+  position: relative;
+  font-size: 22rpx;
+
+  &__tips {
+    position: absolute;
+    z-index: 998;
+    padding: 10rpx 14rpx;
+    color: var(--xz-tooltip--color);
+    background-color: var(--xz-tooltip--bgc);
+    border-radius: 20rpx;
+    box-shadow: 0 -2px 26rpx rgba(0, 0, 0, 0.08);
+    transition: display 1s ease-out;
+
+    &::before {
+      content: "";
+      position: absolute;
+      z-index: 999;
+      border: #{$triangleSize - 2}rpx solid transparent;
+    }
+  }
+
+  &--border .xz-tooltip__tips {
+    border: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  &--square .xz-tooltip__tips {
+    border-radius: 8rpx;
+  }
+}
+
+
+// 控制方位样式类👇
+.xz-tooltip {
+  &--top {
+    @include topAzimuth();
+  }
+
+  &--bottom {
+    @include bottomAzimuth();
+  }
+
+  &--left {
+    @include leftAzimuth();
+  }
+
+  &--right {
+    @include rightAzimuth();
+  }
+
+  @each $align in $azimuthAlign {
+    &--top-#{$align} {
+      @include topAzimuth($align);
+    }
+  }
+  @each $align in $azimuthAlign {
+    &--bottom-#{$align} {
+      @include bottomAzimuth($align);
+    }
+  }
+  @each $align in $azimuthAlign {
+    &--left-#{$align} {
+      @include leftAzimuth($align);
+    }
+  }
+  @each $align in $azimuthAlign {
+    &--right-#{$align} {
+      @include rightAzimuth($align);
+    }
+  }
+}

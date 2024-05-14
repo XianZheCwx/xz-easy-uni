@@ -5,8 +5,8 @@
       <view class="demo-home__title"></view>
     </view>
     <view class="demo-home__bd">
-      <demo-item :title="formOpts.title">
-        <cell v-for="item in formOpts.list" :key="item.to"
+      <demo-item :title="formComponentOpts.title">
+        <cell v-for="item in formComponentOpts.list" :key="item.to"
               :lable="item.label" :to="item.to" />
       </demo-item>
     </view>
@@ -23,7 +23,7 @@
   import { computed, reactive, onMounted } from "vue";
 
   import Cell from "@/components/cell/index.vue";
-  import { formOpts } from "../config/home";
+  import { formComponentOpts } from "../config/home";
 
   const $props = defineProps({});
   const $state = reactive({});

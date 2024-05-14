@@ -10,7 +10,6 @@
     </view>
     <view class="demo-item__bd">
       <slot name="default"/>
-      <text></text>
     </view>
   </view>
 </template>
@@ -23,14 +22,12 @@
    * 编写者: XianZhe
    */
   import { computed, reactive, onMounted } from "vue";
+  import { makeStringProp } from "@/utils/props"
 
   const $props = defineProps({
-    title: {
-      type: String
-    },
-    subTitle: {
-      type: String
-    }
+    title: String,
+    subTitle: String,
+    top: makeStringProp("0px")
   });
   const $state = reactive({});
   const $emits = defineEmits([]);
@@ -48,6 +45,10 @@
       justify-content: space-between;
       align-items: flex-end;
       margin-bottom: 20rpx;
+    }
+
+    &__bd {
+      padding-top: v-bind("$props.top");
     }
 
     &__text {
